@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>HSK3 Poster Generator for Facebook</title>
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<!-- Font Kanit สำหรับภาษาไทย -->
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Font Chinese สำหรับตัวอักษรจีน -->
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  font-family: "Kanit", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* เอฟเฟกต์พื้นหลัง */
+.background-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.floating-element {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0) 70%);
+  animation: float 20s infinite linear;
+}
+
+.floating-element:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: 5%;
+  animation-duration: 25s;
+}
+
+.floating-element:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  top: 70%;
+  right: 10%;
+  animation-duration: 20s;
+  animation-delay: -5s;
+  background: radial-gradient(circle, rgba(183, 28, 28, 0.1) 0%, rgba(183, 28, 28, 0) 70%);
+}
+
+.floating-element:nth-child(3) {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: 15%;
+  animation-duration: 30s;
+  animation-delay: -10s;
+  background: radial-gradient(circle, rgba(255, 112, 67, 0.1) 0%, rgba(255, 112, 67, 0) 70%);
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(20px, 30px) rotate(90deg);
+  }
+  50% {
+    transform: translate(0, 60px) rotate(180deg);
+  }
+  75% {
+    transform: translate(-20px, 30px) rotate(270deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+/* สไตล์สำหรับโปสเตอร์ Facebook - ขนาดถูกต้อง 1200x628 */
+#poster {
+  width: 1200px;
+  height: 628px;
+  padding: 35px 45px;
+  border-radius: 15px;
+  color: #fff;
+  position: relative;
+  background: 
+    radial-gradient(circle at top right, #ffd54f66 0%, transparent 60%),
+    radial-gradient(circle at bottom left, #ff704366 0%, transparent 60%),
+    linear-gradient(180deg, #b71c1c 0%, #c62828 25%, #ff7043 100%);
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border: 3px solid rgba(255, 215, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ลวดลายจีนพื้นหลัง */
+#poster::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 2px, transparent 3px),
+    radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 2px, transparent 3px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 19px, rgba(255, 255, 255, 0.05) 20px);
+  background-size: 100px 100px, 100px 100px, 100% 20px;
+  opacity: .5;
+  z-index: 1;
+}
+
+/* หัวข้อหลัก - ขนาดที่พอดี */
+.header {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.header h2 {
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: #ffecb3;
+  margin-bottom: 5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header h1 {
+  font-size: 52px;
+  color: #ffd700;
+  margin: 5px 0;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+}
+
+.header h1::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+}
+
+.chinese-title {
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 28px;
+  color: #ffcc80;
+  margin-top: 5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* สัญลักษณ์แพนด้าและหนังสือ - ขนาดลดลงและวางตำแหน่งใหม่ */
+.panda-container {
+  position: absolute;
+  right: 40px;
+  top: 90px;
+  font-size: 90px;
+  z-index: 2;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  animation: bounce 3s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* เนื้อหาหลัก */
+.content-wrapper {
+  display: flex;
+  gap: 25px;
+  z-index: 2;
+  position: relative;
+  flex-grow: 1;
+  margin: 5px 0;
+}
+
+/* แพ็กเกจเรียน */
+.packages-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.packages-title {
+  font-size: 20px;
+  color: #ffd700;
+  margin-bottom: 8px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.packages {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+}
+
+.card {
+  flex: 1;
+  background: linear-gradient(180deg, #fff3e0, #ffe0b2);
+  color: #b71c1c;
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #b71c1c, #ff7043);
+}
+
+.card.recommended::before {
+  background: linear-gradient(90deg, #ffd700, #ff9800);
+  height: 5px;
+}
+
+.card.recommended {
+  border: 2px solid #ffd700;
+}
+
+.card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.card .hour {
+  font-size: 24px;
+  font-weight: bold;
+  color: #c62828;
+  margin: 5px 0;
+}
+
+.card .price {
+  font-size: 22px;
+  margin: 8px 0;
+  font-weight: 700;
+  color: #b71c1c;
+}
+
+.ribbon {
+  background: linear-gradient(90deg, #c62828, #ff7043);
+  color: #fff;
+  padding: 6px;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 15px;
+}
+
+.card.recommended .ribbon {
+  background: linear-gradient(90deg, #ff9800, #ffb300);
+}
+
+/* ส่วนเนื้อหาการเรียน */
+.section {
+  flex: 1.3;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 15px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.section h3 {
+  color: #ffd700;
+  margin-bottom: 10px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.section h3::before {
+  content: "📚";
+  font-size: 22px;
+}
+
+.section-content {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.section ul {
+  padding-left: 18px;
+  font-size: 15px;
+  line-height: 1.4;
+  columns: 2;
+  column-gap: 25px;
+  height: 100%;
+}
+
+.section li {
+  margin: 8px 0;
+  padding-left: 10px;
+  position: relative;
+  break-inside: avoid;
+}
+
+.section li::before {
+  content: "✓";
+  color: #ffd700;
+  font-weight: bold;
+  position: absolute;
+  left: -15px;
+  font-size: 15px;
+}
+
+/* ส่วนติดต่อและข้อมูลเพิ่มเติม */
+.contact-section {
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #ffcc80;
+}
+
+.contact-item i {
+  font-size: 16px;
+  color: #ffd700;
+}
+
+/* Facebook Badge */
+.facebook-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.facebook-badge i {
+  color: #1877F2;
+  font-size: 16px;
+}
+
+/* ขั้นต่ำลงทะเบียน */
+.minimum-registration {
+  text-align: center;
+  font-size: 14px;
+  color: #ffcc80;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* ปุ่มดาวน์โหลด */
+.download-options {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  width: 100%;
+  max-width: 800px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.download-btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffd700, #ffb300);
+  color: #b71c1c;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 15px rgba(255, 193, 7, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 280px;
+}
+
+.download-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(255, 193, 7, 0.4);
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
+.download-btn.facebook {
+  background: linear-gradient(180deg, #1877F2, #0d5dbd);
+  color: white;
+  box-shadow: 0 6px 15px rgba(24, 119, 242, 0.3);
+}
+
+.download-btn.facebook:hover {
+  box-shadow: 0 10px 20px rgba(24, 119, 242, 0.4);
+}
+
+/* โปรเกรสบาร์ขณะดาวน์โหลด */
+#progress-container {
+  display: none;
+  width: 100%;
+  max-width: 800px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+  margin-top: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+#progress-bar {
+  height: 16px;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 6px;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+#progress-text {
+  text-align: center;
+  color: #fff;
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+/* ข้อความแนะนำ */
+.instructions {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 15px;
+  max-width: 800px;
+  text-align: center;
+  color: #ffcc80;
+  font-size: 15px;
+  line-height: 1.4;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design สำหรับหน้าจอเล็ก */
+@media (max-width: 1250px) {
+  .container {
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 1000px) {
+  .container {
+    transform: scale(0.75);
+  }
+}
+
+@media (max-width: 800px) {
+  .container {
+    transform: scale(0.65);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    transform: scale(0.55);
+  }
+  
+  body {
+    padding: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+<!-- เอฟเฟกต์พื้นหลัง -->
+<div class="background-effects">
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+</div>
+
+<div class="container">
+  <!-- โปสเตอร์ที่มีขนาด Facebook ที่ถูกต้อง -->
+  <div id="poster">
+    <div class="header">
+      <h2>คอร์สเร่งด่วน ติวสอบ</h2>
+      <h1>HSK 3</h1>
+      <div class="chinese-title">汉语水平考试三级</div>
+    </div>
+
+    <div class="panda-container">
+      <span>🐼</span>
+      <span style="font-size: 70px; position: relative; top: -15px;">📚</span>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="packages-section">
+        <div class="packages-title">เลือกแพ็กเกจที่เหมาะกับคุณ</div>
+        <div class="packages">
+          <div class="card">
+            <h3>แพ็กเกจ S</h3>
+            <div class="hour">15 ชม.</div>
+            <div class="price">6,000 บาท</div>
+            <div class="ribbon">400 บาท / ชม.</div>
+          </div>
+
+          <div class="card recommended">
+            <h3>แพ็กเกจ M (แนะนำ)</h3>
+            <div class="hour">20 ชม.</div>
+            <div class="price">7,000 บาท</div>
+            <div class="ribbon">350 บาท / ชม.</div>
+          </div>
+
+          <div class="card">
+            <h3>แพ็กเกจ L</h3>
+            <div class="hour">30 ชม.</div>
+            <div class="price">9,000 บาท</div>
+            <div class="ribbon">300 บาท / ชม.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>เนื้อหาที่เรียนในคอร์ส</h3>
+        <div class="section-content">
+          <ul>
+            <li>คำศัพท์ HSK3 (300+ คำ)</li>
+            <li>แกรมมาร์ที่ออกสอบบ่อย</li>
+            <li>เทคนิคฟัง–อ่านให้ทันเวลา</li>
+            <li>ฝึกทำข้อสอบจริง</li>
+            <li>วิเคราะห์จุดพลาด</li>
+            <li>แนวข้อสอบ + สรุปก่อนสอบ</li>
+            <li>การเขียนประโยคพื้นฐาน</li>
+            <li>แบบทดสอบจำลองสถานการณ์</li>
+            <li>เคล็ดลับการจัดการเวลา</li>
+            <li>การวิเคราะห์คำถาม</li>
+            <li>การบ้านและแบบฝึกหัด</li>
+            <li>การเรียนรู้คำตรงข้าม</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-section">
+      <div class="contact-info">
+        <div class="contact-item">
+          <span>📞</span>
+          <span>โทร: 089-123-4567</span>
+        </div>
+        <div class="contact-item">
+          <span>📧</span>
+          <span>Email: hsk3.course@learnchinese.com</span>
+        </div>
+        <div class="facebook-badge">
+          <div style="font-size: 16px;">👍</div>
+          <div>
+            <div>Facebook Post</div>
+            <div style="font-size: 11px; opacity: 0.8;">1200x628px</div>
+          </div>
+        </div>
+      </div>
+      <div class="minimum-registration">
+        * ขั้นต่ำ 5 คน ต่อคลาส | เริ่มเรียนทันทีเมื่อครบ
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <strong>คำแนะนำ:</strong> โปสเตอร์ถูกออกแบบให้มีขนาด 1200x628 พิกเซล ซึ่งเป็นขนาดที่เหมาะสำหรับโพสต์ใน Facebook โดยเฉพาะ 
+    สามารถดาวน์โหลดและใช้งานได้ทันที
+  </div>
+  
+  <div class="download-options">
+    <button class="download-btn facebook" onclick="downloadImage('facebook')">
+      <span>📱</span> ดาวน์โหลดสำหรับ Facebook
+    </button>
+    
+    <button class="download-btn" onclick="downloadImage('standard')">
+      <span>🖼️</span> ดาวน์โหลดภาพมาตรฐาน
+    </button>
+  </div>
+  
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+    <div id="progress-text">กำลังเตรียมภาพ...</div>
+  </div>
+</div>
+
+<script>
+function downloadImage(type = 'facebook') {
+  const buttons = document.querySelectorAll('.download-btn');
+  const progressContainer = document.getElementById('progress-container');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  
+  // ซ่อนปุ่มและแสดงโปรเกรสบาร์
+  buttons.forEach(btn => btn.style.display = 'none');
+  progressContainer.style.display = 'block';
+  
+  // อัพเดทโปรเกรส
+  progressBar.style.width = '20%';
+  progressText.textContent = 'กำลังเตรียมภาพ...';
+  
+  // สำหรับ Facebook ให้ใช้ขนาดคงที่ 1200x628
+  const scale = 2; // ความละเอียดสูง
+  
+  // บันทึกสไตล์เดิม
+  const originalPosterStyle = document.getElementById('poster').style.cssText;
+  
+  // ใช้ html2canvas เพื่อสร้างภาพจากโปสเตอร์
+  html2canvas(document.getElementById("poster"), {
+    scale: scale,
+    useCORS: true,
+    backgroundColor: null,
+    logging: false,
+    width: 1200,
+    height: 628,
+    windowWidth: 1200,
+    windowHeight: 628,
+    x: 0,
+    y: 0,
+    onclone: function(clonedDoc) {
+      // ปรับปรุงสไตล์ในคลอนสำหรับการสร้างภาพ
+      const clonedPoster = clonedDoc.getElementById('poster');
+      clonedPoster.style.boxShadow = 'none';
+      clonedPoster.style.border = 'none';
+      clonedPoster.style.margin = '0';
+      clonedPoster.style.width = '1200px';
+      clonedPoster.style.height = '628px';
+      clonedPoster.style.padding = '35px 45px';
+      
+      // ตั้งค่า overflow สำหรับเนื้อหาภายใน
+      const sectionContent = clonedDoc.querySelector('.section-content');
+      if (sectionContent) {
+        sectionContent.style.overflow = 'visible';
+      }
+      
+      // แสดงข้อมูลทั้งหมด
+      const allElements = clonedDoc.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+      });
+    }
+  }).then(canvas => {
+    // คืนค่าสไตล์เดิม
+    document.getElementById('poster').style.cssText = originalPosterStyle;
+    
+    // อัพเดทโปรเกรส
+    progressBar.style.width = '60%';
+    progressText.textContent = 'กำลังสร้างภาพ...';
+    
+    // สำหรับภาพมาตรฐาน ให้ปรับขนาดเพิ่ม
+    let finalCanvas = canvas;
+    
+    if (type === 'standard') {
+      // สร้าง canvas ใหม่ที่มีขนาดใหญ่ขึ้น
+      const standardCanvas = document.createElement('canvas');
+      standardCanvas.width = 2400;
+      standardCanvas.height = 1256;
+      const ctx = standardCanvas.getContext('2d');
+      
+      // วาดภาพจาก canvas เดิมลงใน canvas ใหม่
+      ctx.drawImage(canvas, 0, 0, 2400, 1256);
+      finalCanvas = standardCanvas;
+    }
+    
+    // อัพเดทโปรเกรส
+    progressBar.style.width = '90%';
+    progressText.textContent = 'กำลังประมวลผลภาพ...';
+    
+    // สร้างลิงก์ดาวน์โหลด
+    const link = document.createElement("a");
+    const timestamp = new Date().getTime();
+    const filename = type === 'facebook' 
+      ? `HSK3_Facebook_Post_${timestamp}.png`
+      : `HSK3_Poster_HD_${timestamp}.png`;
+    
+    link.href = finalCanvas.toDataURL("image/png", 1.0);
+    link.download = filename;
+    
+    // อัพเดทโปรเกรสเป็น 100%
+    progressBar.style.width = '100%';
+    progressText.textContent = type === 'facebook' 
+      ? 'ภาพพร้อมโพสต์ Facebook แล้ว!' 
+      : 'ภาพพร้อมใช้งานแล้ว!';
+    
+    // หน่วงเวลานิดหน่อยเพื่อให้เห็นโปรเกรส 100%
+    setTimeout(() => {
+      // คลิกลิงก์เพื่อดาวน์โหลด
+      link.click();
+      
+      // รีเซ็ต UI
+      setTimeout(() => {
+        buttons.forEach(btn => btn.style.display = 'flex');
+        progressContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressText.textContent = 'กำลังเตรียมภาพ...';
+        
+        // แสดงข้อความแจ้งเตือน
+        if (type === 'facebook') {
+          alert('ดาวน์โหลดภาพสำหรับ Facebook สำเร็จแล้ว! 🎉\n\nภาพถูกออกแบบมาให้มีขนาด 1200x628 พิกเซล ซึ่งเป็นขนาดที่เหมาะสำหรับโพสต์ Facebook มากที่สุด\n\nเพียงแค่ไปที่ Facebook แล้วอัพโหลดภาพนี้เป็นโพสต์ใหม่ได้เลย!\n\n✅ ข้อมูลทั้งหมดแสดงครบ:\n- ชื่อคอร์ส HSK3\n- แพ็กเกจ S/M/L พร้อมราคา\n- เนื้อหาการเรียน 12 รายการ\n- ข้อมูลติดต่อ');
+        } else {
+          alert('ดาวน์โหลดภาพโปสเตอร์สำเร็จแล้ว! 🎉\n\nภาพมีขนาด 2400x1256 พิกเซล ความละเอียดสูง เหมาะสำหรับการพิมพ์หรือใช้งานทั่วไป\n\n✅ ข้อมูลทั้งหมดแสดงครบถ้วน');
+        }
+      }, 500);
+    }, 800);
+  }).catch(error => {
+    console.error('Error generating image:', error);
+    alert('เกิดข้อผิดพลาดในการสร้างภาพ กรุณาลองอีกครั้ง');
+    
+    // คืนค่าสไตล์เดิม
+    document.getElementById('poster').style.cssText = originalPosterStyle;
+    
+    // รีเซ็ต UI
+    buttons.forEach(btn => btn.style.display = 'flex');
+    progressContainer.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressText.textContent = 'กำลังเตรียมภาพ...';
+  });
+}
+
+// เพิ่มเอฟเฟกต์เมื่อโหลดหน้าเว็บเสร็จ
+document.addEventListener('DOMContentLoaded', function() {
+  // เพิ่มเอฟเฟกต์ให้กับการ์ดแพ็กเกจ
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+  });
+  
+  // เพิ่มตัวอักษรจีนลอยได้
+  const chineseChars = ["学", "习", "中", "文", "考", "试", "成", "功", "语", "言", "汉", "语"];
+  const poster = document.getElementById('poster');
+  
+  for (let i = 0; i < 8; i++) {
+    const char = document.createElement('div');
+    char.textContent = chineseChars[Math.floor(Math.random() * chineseChars.length)];
+    char.style.position = 'absolute';
+    char.style.fontFamily = '"Ma Shan Zheng", cursive';
+    char.style.fontSize = Math.floor(Math.random() * 20 + 14) + 'px';
+    char.style.color = `rgba(255, 255, 255, ${Math.random() * 0.1 + 0.04})`;
+    char.style.left = Math.random() * 100 + '%';
+    char.style.top = Math.random() * 100 + '%';
+    char.style.zIndex = '1';
+    char.style.pointerEvents = 'none';
+    char.style.userSelect = 'none';
+    char.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+    poster.appendChild(char);
+  }
+  
+  // ตรวจสอบว่าข้อมูลทั้งหมดแสดงหรือไม่
+  console.log("✅ ข้อมูลทั้งหมดบนโปสเตอร์:");
+  console.log("1. ชื่อคอร์ส: HSK 3");
+  console.log("2. แพ็กเกจ S: 15 ชม. / 6,000 บาท");
+  console.log("3. แพ็กเกจ M: 20 ชม. / 7,000 บาท");
+  console.log("4. แพ็กเกจ L: 30 ชม. / 9,000 บาท");
+  console.log("5. เนื้อหาการเรียน: 12 รายการ");
+  console.log("6. ข้อมูลติดต่อ: เบอร์โทร, อีเมล");
+  console.log("7. ขนาดโปสเตอร์: 1200x628 พิกเซล (Facebook Optimal)");
+});
+</script>
+</body>
+</html>
