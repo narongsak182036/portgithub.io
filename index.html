@@ -3,318 +3,532 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ADL Assessment & 30-Day Training Tracker</title>
+<title>ระบบประเมิน ADL </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary:#2563eb;
-    --primary-dark:#1d4ed8;
-    --success:#16a34a;
-    --warning:#f59e0b;
-    --danger:#dc2626;
-    --bg:#f1f5f9;
+    --navy:#0f2a43;
+    --navy-2:#173a5c;
+    --teal:#0f766e;
+    --teal-dark:#115e59;
+    --teal-soft:#e6f4f2;
+    --ok:#15803d;   --ok-bg:#e8f5ec;
+    --warn:#b45309; --warn-bg:#fdf3e1;
+    --bad:#b91c1c;  --bad-bg:#fbe9e9;
+    --bg:#f4f6f9;
     --card:#ffffff;
-    --text:#1e293b;
-    --muted:#64748b;
-    --border:#e2e8f0;
+    --text:#1b2733;
+    --muted:#5f6f80;
+    --border:#dde3ea;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(15,42,67,.06),0 2px 8px rgba(15,42,67,.04);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
   body{
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    line-height:1.6;
-    padding-bottom:80px;
+    font-family:'Noto Sans Thai','Segoe UI',Tahoma,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;
+    -webkit-font-smoothing:antialiased;
   }
-  header{
-    background:linear-gradient(135deg,#2563eb,#1e40af);
-    color:#fff;
-    padding:20px 16px;
-    text-align:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-    position:sticky;top:0;z-index:100;
-  }
-  header h1{font-size:1.4rem;}
-  header p{font-size:.85rem;opacity:.9;}
-  .container{max-width:1100px;margin:0 auto;padding:16px;}
-  .tabs{
-    display:flex;gap:6px;overflow-x:auto;padding:10px 0;
-    position:sticky;top:78px;background:var(--bg);z-index:90;
-    scrollbar-width:thin;
-  }
+  svg.i{width:1.1em;height:1.1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.15em;flex:none;}
+
+  /* ---------- Header ---------- */
+  .app-header{background:var(--navy);color:#fff;border-bottom:3px solid var(--teal);}
+  .app-header .inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:240px;}
+  .brand-mark{width:42px;height:42px;border-radius:10px;background:var(--teal);display:grid;place-items:center;}
+  .brand-mark svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .brand h1{font-size:1.1rem;font-weight:600;line-height:1.3;}
+  .brand p{font-size:.78rem;color:#a9bccf;}
+  .header-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);}
+  .btn-ghost:hover{background:rgba(255,255,255,.16);}
+
+  /* ---------- Patient bar ---------- */
+  .patient-bar{background:#fff;border-bottom:1px solid var(--border);}
+  .patient-bar .inner{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.88rem;}
+  .patient-bar .label{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;}
+  .patient-bar .pname{font-weight:600;}
+  .patient-bar .none{color:var(--muted);}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:var(--teal-soft);color:var(--teal-dark);border-radius:999px;padding:3px 12px;font-weight:600;font-size:.8rem;}
+
+  /* ---------- Layout ---------- */
+  .container{max-width:1180px;margin:0 auto;padding:18px 20px 60px;}
+  .tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:18px;border-bottom:1px solid var(--border);scrollbar-width:thin;}
   .tab{
-    flex:0 0 auto;padding:8px 14px;border-radius:20px;border:1px solid var(--border);
-    background:#fff;color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:600;
-    transition:.2s;white-space:nowrap;
+    flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:11px 16px;border:none;background:none;
+    color:var(--muted);font:inherit;font-weight:500;font-size:.9rem;cursor:pointer;
+    border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:.15s;
   }
-  .tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-  .panel{display:none;animation:fade .3s;}
-  .panel.active{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-  .card{
-    background:var(--card);border-radius:14px;padding:18px;margin-bottom:16px;
-    box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid var(--border);
-  }
-  .card h2{font-size:1.1rem;margin-bottom:12px;color:var(--primary-dark);
-    display:flex;align-items:center;gap:8px;}
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  .tab:hover{color:var(--navy);}
+  .tab.active{color:var(--teal-dark);border-bottom-color:var(--teal);font-weight:600;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:18px;}
+  .card-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .card-head h2{font-size:1rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .card-body{padding:20px;}
+  .hint{font-size:.82rem;color:var(--muted);}
+
+  /* ---------- Forms ---------- */
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:5px;font-weight:500;}
+  label .req{color:var(--bad);}
   input,select,textarea{
     width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
-    font-size:.9rem;font-family:inherit;background:#fff;color:var(--text);
+    font:inherit;font-size:.9rem;background:#fff;color:var(--text);transition:.15s;
   }
-  input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);border-color:transparent;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,118,110,.15);}
   button{
-    padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;
-    font-weight:600;font-family:inherit;transition:.2s;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border:1px solid transparent;
+    border-radius:8px;cursor:pointer;font:inherit;font-size:.88rem;font-weight:600;transition:.15s;
   }
-  .btn-primary{background:var(--primary);color:#fff;}
-  .btn-primary:hover{background:var(--primary-dark);}
-  .btn-success{background:var(--success);color:#fff;}
-  .btn-danger{background:var(--danger);color:#fff;}
-  .btn-outline{background:#fff;color:var(--primary);border:1px solid var(--primary);}
-  .btn-outline:hover{background:#eff6ff;}
-  .btn-sm{padding:6px 12px;font-size:.8rem;}
+  button:focus-visible{outline:3px solid rgba(15,118,110,.35);outline-offset:1px;}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-navy{background:var(--navy);color:#fff;}
+  .btn-navy:hover{background:var(--navy-2);}
+  .btn-outline{background:#fff;color:var(--navy);border-color:var(--border);}
+  .btn-outline:hover{background:#f4f6f9;border-color:#c3ccd7;}
+  .btn-danger{background:#fff;color:var(--bad);border-color:#f0c5c5;}
+  .btn-danger:hover{background:var(--bad-bg);}
+  .btn-sm{padding:5px 10px;font-size:.8rem;}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .search-box{margin-bottom:12px;}
+  .row.between{justify-content:space-between;}
 
-  /* ADL items */
-  .adl-item{
-    display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
-    padding:10px 12px;border-bottom:1px solid var(--border);
-  }
+  /* ---------- Stats ---------- */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px;}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+  .stat .label{font-size:.75rem;color:var(--muted);font-weight:500;}
+  .stat .value{font-size:1.7rem;font-weight:700;color:var(--navy);line-height:1.2;margin-top:2px;}
+  .stat .sub{font-size:.75rem;color:var(--muted);}
+  .stat.accent{border-left:4px solid var(--teal);}
+
+  /* ---------- Patient list ---------- */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.87rem;}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle;}
+  th{background:#f7f9fb;font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-weight:600;white-space:nowrap;}
+  tbody tr:hover{background:#fafbfc;}
+  tr.selected{background:var(--teal-soft)!important;}
+  td.num,th.num{text-align:center;}
+  .name-cell{font-weight:600;color:var(--navy);}
+  .name-cell small{display:block;font-weight:400;color:var(--muted);font-size:.76rem;}
+  .actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+
+  /* ---------- Badges ---------- */
+  .badge{display:inline-block;padding:3px 11px;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;}
+  .score-good{background:var(--ok-bg);color:var(--ok);}
+  .score-mid{background:var(--warn-bg);color:var(--warn);}
+  .score-bad{background:var(--bad-bg);color:var(--bad);}
+  .score-none{background:#eef1f5;color:var(--muted);}
+  .delta-up{color:var(--ok);font-weight:700;}
+  .delta-down{color:var(--bad);font-weight:700;}
+  .delta-zero{color:var(--muted);font-weight:600;}
+
+  /* ---------- ADL form ---------- */
+  .adl-item{display:grid;grid-template-columns:36px 1fr minmax(220px,300px);gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--border);}
   .adl-item:last-child{border-bottom:none;}
-  .adl-item .name{font-size:.9rem;font-weight:600;}
-  .adl-item .name small{display:block;font-weight:400;color:var(--muted);font-size:.75rem;}
-  .adl-item select{max-width:280px;}
+  .adl-no{width:28px;height:28px;border-radius:50%;background:var(--teal-soft);color:var(--teal-dark);display:grid;place-items:center;font-size:.78rem;font-weight:700;}
+  .adl-item .name{font-size:.92rem;font-weight:600;color:var(--navy);}
+  .adl-item .name small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;}
+  .score-panel{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#f7f9fb;border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-top:14px;}
+  .score-big{font-size:2rem;font-weight:700;color:var(--navy);line-height:1;}
+  .score-big small{font-size:1rem;color:var(--muted);font-weight:500;}
+  .meter{flex:1;min-width:180px;height:10px;background:#e3e8ee;border-radius:999px;overflow:hidden;}
+  .meter>div{height:100%;border-radius:999px;transition:width .35s,background .35s;}
+  .assessed-note{font-size:.8rem;color:var(--muted);}
 
-  .score-badge{
-    display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.9rem;
+  /* ---------- Program ---------- */
+  .progress{height:10px;background:#e3e8ee;border-radius:999px;overflow:hidden;}
+  .progress>div{height:100%;background:var(--teal);transition:width .35s;}
+  .week{margin-top:18px;}
+  .week h3{font-size:.85rem;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .week h3 span{color:var(--muted);font-weight:400;}
+  .day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;}
+  .day-card{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff;transition:.15s;}
+  .day-card.done{background:var(--ok-bg);border-color:#bde0c8;}
+  .day-card .day-num{font-weight:700;color:var(--navy);font-size:.8rem;display:flex;justify-content:space-between;}
+  .day-card .task{font-size:.8rem;color:#3d4c5b;margin:4px 0 8px;min-height:2.6em;}
+  .day-card label{display:flex;align-items:center;gap:7px;margin:0;font-size:.8rem;color:var(--text);cursor:pointer;font-weight:500;}
+  .day-card input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);}
+
+  .daily-controls{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:14px;align-items:end;margin:20px 0 8px;}
+  .daynum-badge{display:inline-block;background:var(--navy);color:#fff;border-radius:999px;padding:6px 16px;font-weight:600;font-size:.88rem;white-space:nowrap;}
+  .daynum-badge.out{background:var(--warn-bg);color:var(--warn);}
+  .warn-box{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:9px 14px;font-size:.85rem;margin:8px 0;}
+  .train-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--teal-soft);border-radius:8px;margin-top:16px;}
+  .train-row input{width:18px;height:18px;accent-color:var(--teal);flex:none;}
+  .train-row label{margin:0;color:var(--text);font-size:.9rem;cursor:pointer;}
+  .section-title{font-size:.92rem;color:var(--navy);margin:26px 0 10px;padding-left:10px;border-left:4px solid var(--teal);font-weight:600;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-title span{font-weight:400;color:var(--muted);font-size:.8rem;}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;}
+  .tile{border:1px solid var(--border);border-radius:8px;padding:7px 4px;text-align:center;cursor:pointer;background:#fff;transition:.15s;}
+  .tile:hover{border-color:var(--teal);}
+  .tile .tn{font-size:.7rem;color:var(--muted);}
+  .tile .ts{font-size:1.1rem;font-weight:700;color:var(--navy);line-height:1.3;}
+  .tile.good{background:var(--ok-bg);border-color:#bde0c8;}
+  .tile.mid{background:var(--warn-bg);border-color:#f0dcb4;}
+  .tile.bad{background:var(--bad-bg);border-color:#f0c5c5;}
+  .tile.sel{outline:3px solid var(--teal);outline-offset:1px;}
+  .tile.today .tn{color:var(--teal-dark);font-weight:700;}
+  textarea{resize:vertical;min-height:60px;}
+  @media (max-width:820px){.daily-controls{grid-template-columns:1fr 1fr;}}
+  /* ---------- Charts ---------- */
+  .chart-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;margin-bottom:18px;}
+  .chart-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+  .chart-box h3{font-size:.88rem;color:var(--navy);margin-bottom:10px;}
+  .hbar{display:grid;grid-template-columns:130px 1fr 34px;gap:8px;align-items:center;margin-bottom:7px;font-size:.78rem;}
+  .hbar .track{position:relative;height:10px;background:#eaeef3;border-radius:999px;}
+  .hbar .fill{position:absolute;left:0;top:0;height:100%;border-radius:999px;background:var(--teal);}
+  .hbar .base{position:absolute;left:0;top:0;height:100%;border-radius:999px;background:#9fb3c8;}
+  .hbar .goal{position:absolute;top:-3px;width:2px;height:16px;background:var(--navy);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.76rem;color:var(--muted);margin-top:10px;}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+
+  .empty{text-align:center;color:var(--muted);padding:36px 12px;font-size:.9rem;}
+  .empty svg{width:34px;height:34px;margin-bottom:8px;opacity:.5;}
+
+  /* ---------- Toast & modal ---------- */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:#fff;padding:11px 20px;border-radius:8px;font-size:.86rem;opacity:0;pointer-events:none;transition:.25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.2);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal-bg{position:fixed;inset:0;background:rgba(15,42,67,.45);display:none;align-items:center;justify-content:center;z-index:500;padding:16px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:#fff;border-radius:12px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  .modal h3{color:var(--navy);margin-bottom:8px;font-size:1.05rem;}
+  .modal p{color:var(--muted);font-size:.9rem;margin-bottom:18px;}
+
+  /* ---------- Report ---------- */
+  .report{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:34px 38px;max-width:820px;margin:0 auto;}
+  .report-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--navy);padding-bottom:14px;margin-bottom:18px;gap:16px;}
+  .report-head h2{font-size:1.25rem;color:var(--navy);line-height:1.35;}
+  .report-head .org{font-size:.82rem;color:var(--muted);}
+  .report-head .meta{text-align:right;font-size:.8rem;color:var(--muted);white-space:nowrap;}
+  .report h3{font-size:.92rem;color:var(--navy);margin:20px 0 8px;padding-left:10px;border-left:4px solid var(--teal);}
+  .info-table th{width:150px;background:#f7f9fb;text-transform:none;font-size:.82rem;letter-spacing:0;}
+  .summary-box{background:var(--teal-soft);border:1px solid #bfe0dc;border-radius:8px;padding:12px 16px;font-size:.9rem;margin-top:6px;}
+  .sign-row{margin-top:46px;display:flex;justify-content:space-between;gap:30px;font-size:.85rem;}
+  .sign-row div{flex:1;text-align:center;}
+  .sign-line{border-top:1px solid #333;margin:38px 12px 4px;}
+
+  @media (max-width:820px){
+    .chart-grid{grid-template-columns:1fr;}
+    .adl-item{grid-template-columns:30px 1fr;}
+    .adl-item select{grid-column:1 / -1;}
+    .report{padding:20px;}
   }
-  .score-good{background:#dcfce7;color:#166534;}
-  .score-mid{background:#fef3c7;color:#92400e;}
-  .score-bad{background:#fee2e2;color:#991b1b;}
-
-  table{width:100%;border-collapse:collapse;font-size:.85rem;}
-  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-  th{background:#f8fafc;font-size:.78rem;color:var(--muted);text-transform:uppercase;}
-  tr:hover{background:#f8fafc;}
-
-  .patient-card{
-    border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;
-    background:#fff;cursor:pointer;transition:.2s;
-  }
-  .patient-card:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(37,99,235,.15);}
-  .patient-card.selected{border-color:var(--primary);background:#eff6ff;}
-  .patient-card .pname{font-weight:700;font-size:1rem;}
-  .patient-card .pinfo{font-size:.8rem;color:var(--muted);}
-
-  .progress-bar{
-    height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;margin-top:6px;
-  }
-  .progress-bar > div{height:100%;background:var(--primary);transition:width .4s;}
-
-  .day-grid{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;
-  }
-  .day-card{
-    border:1px solid var(--border);border-radius:8px;padding:8px;font-size:.75rem;
-    background:#fff;
-  }
-  .day-card.done{background:#dcfce7;border-color:#86efac;}
-  .day-card .day-num{font-weight:700;color:var(--primary-dark);}
-  .day-card input[type=checkbox]{width:auto;margin-right:4px;}
-  .day-card label{display:flex;align-items:center;gap:4px;margin:0;font-size:.75rem;color:var(--text);}
-
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
-  .stat{background:#f8fafc;border-radius:10px;padding:12px;text-align:center;}
-  .stat .value{font-size:1.6rem;font-weight:800;color:var(--primary-dark);}
-  .stat .label{font-size:.75rem;color:var(--muted);}
-
-  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:.9rem;}
-  .toast{
-    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-    background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:.85rem;
-    opacity:0;pointer-events:none;transition:.3s;z-index:999;
-  }
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(-10px);}
-
   @media print{
-    header,.tabs,.no-print{display:none!important;}
-    body{background:#fff;padding:0;}
-    .panel{display:block!important;}
-    .card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;}
-  }
-  @media (max-width:600px){
-    .adl-item{grid-template-columns:1fr;}
-    .adl-item select{max-width:100%;}
-    header h1{font-size:1.1rem;}
+    @page{size:A4;margin:14mm;}
+    .app-header,.patient-bar,.tabs,.no-print,.toast{display:none!important;}
+    body{background:#fff;font-size:13px;}
+    .container{padding:0;max-width:none;}
+    .panel{display:none!important;}
+    #panel-report{display:block!important;}
+    #panel-report>.card{border:none;box-shadow:none;}
+    #panel-report .card-head{display:none;}
+    #panel-report .card-body{padding:0;}
+    .report{border:none;padding:0;max-width:none;}
+    .report h3,.sign-row{page-break-inside:avoid;}
+    table{page-break-inside:auto;} tr{page-break-inside:avoid;}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🏥 ระบบประเมิน ADL และติดตามผล 30 วัน</h1>
-  <p>Barthel ADL Index • สำหรับผู้สูงอายุรายบุคคล</p>
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  </defs>
+</svg>
+
+<header class="app-header">
+  <div class="inner">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div>
+        <h1>ระบบประเมิน ADL </h1>
+        <p>Barthel Activities of Daily Living Index </p>
+      </div>
+    </div>
+    <div class="header-actions no-print">
+      <button class="btn-ghost" onclick="exportBackup()"><svg class="i"><use href="#i-down"/></svg>สำรองข้อมูล</button>
+      <button class="btn-ghost" onclick="document.getElementById('import-file').click()"><svg class="i"><use href="#i-up"/></svg>นำเข้าข้อมูล</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none" onchange="importBackup(event)">
+    </div>
+  </div>
 </header>
 
+<div class="patient-bar no-print">
+  <div class="inner" id="patient-bar">
+    <span class="label">ผู้สูงอายุที่เลือก</span>
+    <span class="none">ยังไม่ได้เลือก — เลือกจากทะเบียนด้านล่าง</span>
+  </div>
+</div>
+
 <div class="container">
-  <div class="tabs no-print">
-    <button class="tab active" data-tab="register">👤 ทะเบียนผู้สูงอายุ</button>
-    <button class="tab" data-tab="assess">📊 ประเมิน ADL</button>
-    <button class="tab" data-tab="goals">🎯 เป้าหมาย</button>
-    <button class="tab" data-tab="program">📅 โปรแกรม 30 วัน</button>
-    <button class="tab" data-tab="compare">📉 เปรียบเทียบ</button>
-    <button class="tab" data-tab="report">🖨️ รายงาน</button>
-  </div>
+  <nav class="tabs no-print" role="tablist">
+    <button class="tab active" data-tab="register"><svg class="i"><use href="#i-users"/></svg>ทะเบียนผู้สูงอายุ</button>
+    <button class="tab" data-tab="goals"><svg class="i"><use href="#i-target"/></svg>เป้าหมาย</button>
+    <button class="tab" data-tab="program"><svg class="i"><use href="#i-cal"/></svg>ตรวจรายวัน</button>
+    <button class="tab" data-tab="compare"><svg class="i"><use href="#i-chart"/></svg>เปรียบเทียบผล</button>
+    <button class="tab" data-tab="report"><svg class="i"><use href="#i-print"/></svg>รายงาน</button>
+  </nav>
 
-  <!-- ============ TAB: REGISTER ============ -->
+  <!-- ============ REGISTER ============ -->
   <div class="panel active" id="panel-register">
+    <div class="stat-grid" id="dash-stats"></div>
+
     <div class="card">
-      <h2>👤 เพิ่มผู้สูงอายุใหม่</h2>
-      <div class="form-grid">
-        <div><label>ชื่อ-นามสกุล *</label><input id="reg-name" placeholder="เช่น นางสมใจ ใจดี"></div>
-        <div><label>อายุ</label><input id="reg-age" type="number" min="0" placeholder="เช่น 75"></div>
-        <div><label>เพศ</label>
-          <select id="reg-gender"><option value="">-- เลือก --</option><option>ชาย</option><option>หญิง</option></select>
+      <div class="card-head"><h2 id="reg-title"><svg class="i"><use href="#i-plus"/></svg>เพิ่มผู้สูงอายุใหม่</h2></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div><label>ชื่อ-นามสกุล <span class="req">*</span></label><input id="reg-name" placeholder="เช่น นางสมใจ ใจดี"></div>
+          <div><label>อายุ (ปี)</label><input id="reg-age" type="number" min="0" max="130" placeholder="เช่น 75"></div>
+          <div><label>เพศ</label>
+            <select id="reg-gender"><option value="">— เลือก —</option><option>ชาย</option><option>หญิง</option></select>
+          </div>
+          <div><label>HN / เลขประจำตัว</label><input id="reg-hn" placeholder="เช่น 12345"></div>
+          <div><label>โรคประจำตัว</label><input id="reg-disease" placeholder="เช่น เบาหวาน, ความดันโลหิตสูง"></div>
+          <div><label>ผู้ดูแล / เบอร์โทร</label><input id="reg-caregiver" placeholder="เช่น ลูกสาว 081-234-5678"></div>
         </div>
-        <div><label>HN / เลขประจำตัว</label><input id="reg-hn" placeholder="เช่น 12345"></div>
-        <div><label>โรคประจำตัว</label><input id="reg-disease" placeholder="เช่น เบาหวาน, ความดัน"></div>
-        <div><label>ผู้ดูแล / เบอร์โทร</label><input id="reg-caregiver" placeholder="เช่น ลูกสาว 0812345678"></div>
-      </div>
-      <div class="row" style="margin-top:12px;">
-        <button class="btn-primary" onclick="addPatient()">➕ เพิ่มผู้สูงอายุ</button>
-        <button class="btn-outline" onclick="clearRegisterForm()">ล้างฟอร์ม</button>
+        <div class="row" style="margin-top:16px;">
+          <button class="btn-primary" id="reg-submit" onclick="submitPatient()"><svg class="i"><use href="#i-plus"/></svg><span>เพิ่มผู้สูงอายุ</span></button>
+          <button class="btn-outline" onclick="clearRegisterForm()">ล้างฟอร์ม</button>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>📋 รายชื่อผู้สูงอายุ</h2>
-      <div class="search-box">
-        <input id="search-patient" placeholder="🔎 ค้นหาชื่อ, HN, โรคประจำตัว..." oninput="renderPatientList()">
+      <div class="card-head">
+        <h2><svg class="i"><use href="#i-users"/></svg>รายชื่อผู้สูงอายุ</h2>
+        <div style="position:relative;min-width:240px;flex:0 1 320px;">
+          <input id="search-patient" placeholder="ค้นหาชื่อ, HN, โรคประจำตัว" oninput="renderPatientList()">
+        </div>
       </div>
-      <div id="patient-list"></div>
+      <div class="table-wrap" id="patient-list"></div>
     </div>
   </div>
 
-  <!-- ============ TAB: ASSESS ============ -->
+  <!-- ============ ASSESS ============ -->
   <div class="panel" id="panel-assess">
     <div class="card">
-      <h2>📊 ประเมิน Barthel ADL Index (10 รายการ)</h2>
-      <div id="assess-patient-info" class="empty">กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน</div>
-      <div id="adl-form" style="display:none;">
-        <div class="row no-print" style="margin-bottom:12px;">
-          <label style="margin:0;">ช่วงการประเมิน:</label>
-          <select id="assess-phase" onchange="loadAssessment()">
+      <div class="card-head">
+        <h2><svg class="i"><use href="#i-clip"/></svg>แบบประเมิน Barthel ADL Index (10 รายการ)</h2>
+        <div class="row no-print" id="phase-wrap" style="display:none;">
+          <label style="margin:0;">ช่วงการประเมิน</label>
+          <select id="assess-phase" onchange="loadAssessment()" style="width:auto;">
             <option value="baseline">ก่อนเริ่ม (Baseline)</option>
             <option value="day15">วันที่ 15</option>
             <option value="day30">วันที่ 30</option>
           </select>
         </div>
-        <div id="adl-items"></div>
-        <div class="card" style="background:#f8fafc;margin-top:12px;">
-          <div class="row" style="justify-content:space-between;">
-            <div><strong>คะแนนรวม:</strong> <span id="total-score" class="score-badge score-bad">0</span></div>
-            <div><strong>ระดับ:</strong> <span id="dep-level">-</span></div>
+      </div>
+      <div class="card-body">
+        <div id="assess-patient-info" class="empty"></div>
+        <div id="adl-form" style="display:none;">
+          <div id="adl-items"></div>
+          <div class="score-panel">
+            <div>
+              <div class="hint">คะแนนรวม</div>
+              <div class="score-big"><span id="total-num">0</span><small> / 100</small></div>
+            </div>
+            <div class="meter"><div id="total-meter" style="width:0"></div></div>
+            <div style="text-align:right;">
+              <div class="hint">ระดับการพึ่งพิง</div>
+              <span id="dep-level" class="badge score-none">-</span>
+            </div>
+          </div>
+          <div class="row between no-print" style="margin-top:16px;">
+            <span class="assessed-note" id="assessed-note"></span>
+            <button class="btn-primary" onclick="saveAssessment()"><svg class="i"><use href="#i-save"/></svg>บันทึกผลประเมิน</button>
           </div>
         </div>
-        <div class="row no-print" style="margin-top:12px;">
-          <button class="btn-success" onclick="saveAssessment()">💾 บันทึกผลประเมิน</button>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- ============ TAB: GOALS ============ -->
+  <!-- ============ GOALS ============ -->
   <div class="panel" id="panel-goals">
     <div class="card">
-      <h2>🎯 ตั้งเป้าหมายรายกิจกรรม</h2>
-      <div id="goals-patient-info" class="empty">กรุณาเลือกผู้สูงอายุก่อน</div>
-      <div id="goals-form" style="display:none;">
-        <div id="goals-list"></div>
-        <div class="row no-print" style="margin-top:12px;">
-          <button class="btn-success" onclick="saveGoals()">💾 บันทึกเป้าหมาย</button>
+      <div class="card-head"><h2><svg class="i"><use href="#i-target"/></svg>เป้าหมายรายกิจกรรม</h2></div>
+      <div class="card-body">
+        <div id="goals-patient-info" class="empty"></div>
+        <div id="goals-form" style="display:none;">
+          <p class="hint" style="margin-bottom:6px;">กำหนดระดับความสามารถที่คาดหวังหลังครบ 30 วัน (ค่าเริ่มต้น = คะแนนเต็มของแต่ละกิจกรรม)</p>
+          <div id="goals-list"></div>
+          <div class="row between no-print" style="margin-top:16px;">
+            <button class="btn-outline" onclick="setGoalsToMax()">ตั้งเป็นคะแนนเต็มทั้งหมด</button>
+            <button class="btn-primary" onclick="saveGoals()"><svg class="i"><use href="#i-save"/></svg>บันทึกเป้าหมาย</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ============ TAB: PROGRAM ============ -->
+  <!-- ============ DAILY ============ -->
   <div class="panel" id="panel-program">
     <div class="card">
-      <h2>📅 โปรแกรมฝึก ADL 30 วัน</h2>
-      <div id="program-patient-info" class="empty">กรุณาเลือกผู้สูงอายุก่อน</div>
-      <div id="program-content" style="display:none;">
-        <div class="row" style="margin-bottom:12px;">
-          <div class="stat" style="flex:1;"><div class="value" id="prog-done">0</div><div class="label">วันที่ทำแล้ว</div></div>
-          <div class="stat" style="flex:1;"><div class="value" id="prog-percent">0%</div><div class="label">ความคืบหน้า</div></div>
+      <div class="card-head"><h2><svg class="i"><use href="#i-cal"/></svg>ตรวจประเมิน ADL รายวัน (30 วัน)</h2></div>
+      <div class="card-body">
+        <div id="program-patient-info" class="empty"></div>
+        <div id="program-content" style="display:none;">
+          <div class="stat-grid" id="daily-stats"></div>
+
+          <div class="daily-controls no-print">
+            <div class="row" style="flex-wrap:nowrap;">
+              <button class="btn-outline btn-sm" onclick="shiftDay(-1)" aria-label="วันก่อนหน้า">◀</button>
+              <button class="btn-outline btn-sm" onclick="shiftDay(1)" aria-label="วันถัดไป">▶</button>
+            </div>
+            <div><label>วันที่ตรวจ</label><input type="date" id="daily-date" onchange="loadDaily()"></div>
+            <div><label>วันเริ่มโปรแกรม (วันที่ 1)</label><input type="date" id="daily-start" onchange="changeStart()"></div>
+            <div><span class="daynum-badge" id="daily-daynum">-</span></div>
+          </div>
+          <div id="daily-warning"></div>
+
+          <div id="daily-items"></div>
+          <div class="train-row">
+            <input type="checkbox" id="daily-trained">
+            <label for="daily-trained">ทำกิจกรรมฝึกประจำวันแล้ว: <strong id="daily-task">-</strong></label>
+          </div>
+          <div style="margin-top:14px;">
+            <label>บันทึกเพิ่มเติม (อาการ อุปสรรค ข้อสังเกต)</label>
+            <textarea id="daily-note" placeholder="เช่น เดินได้ไกลขึ้น วันนี้ปวดเข่าเล็กน้อย"></textarea>
+          </div>
+
+          <div class="score-panel">
+            <div>
+              <div class="hint">คะแนนรวมวันนี้</div>
+              <div class="score-big"><span id="d-total-num">0</span><small> / 100</small></div>
+            </div>
+            <div class="meter"><div id="d-total-meter" style="width:0"></div></div>
+            <div style="text-align:right;">
+              <div class="hint">ระดับการพึ่งพิง</div>
+              <span id="d-dep-level" class="badge score-none">-</span>
+            </div>
+          </div>
+          <div class="row between no-print" style="margin-top:16px;">
+            <span class="assessed-note" id="daily-status"></span>
+            <div class="row">
+              <button class="btn-danger" id="daily-del" onclick="deleteDaily()"><svg class="i"><use href="#i-trash"/></svg>ลบบันทึกวันนี้</button>
+              <button class="btn-primary" id="daily-save" onclick="saveDaily()"><svg class="i"><use href="#i-save"/></svg>บันทึกผลวันนี้</button>
+            </div>
+          </div>
+
+          <div class="section-title">ภาพรวม  <span>คลิกที่วันเพื่อดู/แก้ไขบันทึก</span></div>
+          <div id="program-grid" class="tiles"></div>
         </div>
-        <div class="progress-bar"><div id="prog-bar" style="width:0%"></div></div>
-        <div id="program-grid" class="day-grid" style="margin-top:14px;"></div>
       </div>
     </div>
   </div>
 
-  <!-- ============ TAB: COMPARE ============ -->
+  <!-- ============ COMPARE ============ -->
   <div class="panel" id="panel-compare">
     <div class="card">
-      <h2>📉 เปรียบเทียบคะแนนก่อน–หลัง</h2>
-      <div id="compare-patient-info" class="empty">กรุณาเลือกผู้สูงอายุก่อน</div>
-      <div id="compare-content" style="display:none;">
-        <div class="stat-grid" style="margin-bottom:14px;">
-          <div class="stat"><div class="value" id="cmp-base">-</div><div class="label">Baseline</div></div>
-          <div class="stat"><div class="value" id="cmp-d15">-</div><div class="label">วันที่ 15</div></div>
-          <div class="stat"><div class="value" id="cmp-d30">-</div><div class="label">วันที่ 30</div></div>
-          <div class="stat"><div class="value" id="cmp-change">-</div><div class="label">เปลี่ยนแปลง</div></div>
+      <div class="card-head"><h2><svg class="i"><use href="#i-chart"/></svg>เปรียบเทียบคะแนนก่อน–หลัง</h2></div>
+      <div class="card-body">
+        <div id="compare-patient-info" class="empty"></div>
+        <div id="compare-content" style="display:none;">
+          <div class="stat-grid">
+            <div class="stat"><div class="label">Baseline</div><div class="value" id="cmp-base">-</div></div>
+            <div class="stat"><div class="label">วันที่ 15</div><div class="value" id="cmp-d15">-</div></div>
+            <div class="stat"><div class="label">วันที่ 30</div><div class="value" id="cmp-d30">-</div></div>
+            <div class="stat accent"><div class="label">การเปลี่ยนแปลง</div><div class="value" id="cmp-change">-</div><div class="sub" id="cmp-change-sub"></div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-box"><h3>แนวโน้มคะแนนรวม</h3><div id="trend-chart"></div></div>
+            <div class="chart-box">
+              <h3>ความสามารถรายกิจกรรม (เทียบกับคะแนนเต็ม)</h3>
+              <div id="item-bars"></div>
+              <div class="legend"><span><i style="background:#9fb3c8"></i>Baseline</span><span><i style="background:var(--teal)"></i>ล่าสุด</span><span><i style="background:var(--navy)"></i>เป้าหมาย</span></div>
+            </div>
+          </div>
+          <div class="table-wrap" id="compare-table"></div>
         </div>
-        <div id="compare-table"></div>
       </div>
     </div>
   </div>
 
-  <!-- ============ TAB: REPORT ============ -->
+  <!-- ============ REPORT ============ -->
   <div class="panel" id="panel-report">
     <div class="card">
-      <h2>🖨️ รายงานสำหรับญาติ</h2>
-      <div id="report-patient-info" class="empty">กรุณาเลือกผู้สูงอายุก่อน</div>
-      <div id="report-content" style="display:none;">
-        <div class="row no-print" style="margin-bottom:12px;">
-          <button class="btn-primary" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
+      <div class="card-head">
+        <h2><svg class="i"><use href="#i-print"/></svg>รายงานสำหรับญาติและผู้ดูแล</h2>
+        <button class="btn-navy no-print" id="print-btn" onclick="window.print()" style="display:none;"><svg class="i"><use href="#i-print"/></svg>พิมพ์ / บันทึก PDF</button>
+      </div>
+      <div class="card-body">
+        <div id="report-patient-info" class="empty"></div>
+        <div id="report-content" style="display:none;">
+          <div class="no-print" style="margin-bottom:14px;max-width:820px;margin-left:auto;margin-right:auto;">
+            <label>ชื่อหน่วยงาน (แสดงบนหัวรายงาน)</label>
+            <input id="org-name" placeholder="เช่น โรงพยาบาลส่งเสริมสุขภาพตำบล..." oninput="saveOrg();renderReportBody()">
+          </div>
+          <div id="report-body"></div>
         </div>
-        <div id="report-body"></div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modal-title"></h3>
+    <p id="modal-text"></p>
+    <div class="row" style="justify-content:flex-end;">
+      <button class="btn-outline" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn-danger" id="modal-ok">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 /* ============================================================
-   DATA LAYER
+   DATA LAYER  (ใช้ key เดิม — ข้อมูลที่บันทึกไว้ก่อนหน้ายังใช้ได้)
    ============================================================ */
 const STORAGE_KEY = 'adl_app_data_v1';
 let DB = loadDB();
 let currentPatientId = null;
+let editingId = null;
 
 function loadDB(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw){ const d = JSON.parse(raw); if(d && Array.isArray(d.patients)) return d; }
   }catch(e){}
-  return { patients: [] };
+  return { patients: [], org: '' };
 }
 function saveDB(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); }
+  catch(e){ toast('ไม่สามารถบันทึกข้อมูลในเบราว์เซอร์ได้'); }
 }
 function uid(){ return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function ico(id){ return `<svg class="i"><use href="#${id}"/></svg>`; }
 
 /* ============================================================
-   BARTHEL ADL INDEX (10 รายการ, คะแนนเต็ม 100)
+   BARTHEL ADL INDEX
    ============================================================ */
 const ADL_ITEMS = [
   { id:'feeding', name:'รับประทานอาหาร', desc:'เมื่อมีอาหารอยู่ตรงหน้า',
-    options:[{v:10,t:'ทำได้เองทั้งหมด'},{v:5,t:'ต้องช่วยบางอย่าง'},{v:0,t:'ทำไม่ได้/ต้องป้อน'}] },
+    options:[{v:10,t:'ทำได้เองทั้งหมด'},{v:5,t:'ต้องช่วยบางอย่าง'},{v:0,t:'ทำไม่ได้ / ต้องป้อน'}] },
   { id:'bathing', name:'การอาบน้ำ', desc:'การทำความสะอาดร่างกาย',
     options:[{v:5,t:'อาบเองได้'},{v:0,t:'ต้องมีคนช่วย'}] },
   { id:'grooming', name:'การดูแลความสะอาดส่วนตัว', desc:'ล้างหน้า แปรงฟัน หวีผม',
@@ -322,462 +536,742 @@ const ADL_ITEMS = [
   { id:'dressing', name:'การสวมใส่เสื้อผ้า', desc:'รวมติดกระดุม รองเท้า',
     options:[{v:10,t:'ทำเองได้ทั้งหมด'},{v:5,t:'ต้องช่วยบางอย่าง'},{v:0,t:'ทำไม่ได้'}] },
   { id:'bowels', name:'การควบคุมการขับถ่ายอุจจาระ', desc:'',
-    options:[{v:10,t:'ควบคุมได้ปกติ'},{v:5,t:'ควบคุมไม่ได้บางครั้ง'},{v:0,t:'ควบคุมไม่ได้/ท้องผูก'}] },
+    options:[{v:10,t:'ควบคุมได้ปกติ'},{v:5,t:'ควบคุมไม่ได้บางครั้ง'},{v:0,t:'ควบคุมไม่ได้ / ท้องผูก'}] },
   { id:'bladder', name:'การควบคุมการขับถ่ายปัสสาวะ', desc:'',
-    options:[{v:10,t:'ควบคุมได้ปกติ'},{v:5,t:'ควบคุมไม่ได้บางครั้ง'},{v:0,t:'ควบคุมไม่ได้/ใส่สายสวน'}] },
+    options:[{v:10,t:'ควบคุมได้ปกติ'},{v:5,t:'ควบคุมไม่ได้บางครั้ง'},{v:0,t:'ควบคุมไม่ได้ / ใส่สายสวน'}] },
   { id:'toilet', name:'การใช้ห้องน้ำ', desc:'เข้า-ออก ใช้สุขภัณฑ์',
     options:[{v:10,t:'ใช้เองได้'},{v:5,t:'ต้องช่วยบางอย่าง'},{v:0,t:'ทำไม่ได้'}] },
   { id:'transfer', name:'การเคลื่อนย้ายตัว', desc:'ลุกจากเตียงไปเก้าอี้',
     options:[{v:15,t:'ทำเองได้'},{v:10,t:'ต้องช่วยเล็กน้อย'},{v:5,t:'ต้องช่วยมาก'},{v:0,t:'ทำไม่ได้'}] },
-  { id:'mobility', name:'การเดิน/เคลื่อนที่', desc:'',
+  { id:'mobility', name:'การเดิน / เคลื่อนที่', desc:'',
     options:[{v:15,t:'เดินได้เอง'},{v:10,t:'เดินได้โดยมีคนช่วย'},{v:5,t:'ใช้รถเข็นได้เอง'},{v:0,t:'เคลื่อนที่ไม่ได้'}] },
   { id:'stairs', name:'การขึ้นลงบันได', desc:'',
     options:[{v:10,t:'ขึ้นลงได้เอง'},{v:5,t:'ต้องมีคนช่วย'},{v:0,t:'ทำไม่ได้'}] }
 ];
+const itemMax = it => Math.max(...it.options.map(o=>o.v));
+const MAX_SCORE = ADL_ITEMS.reduce((s,i)=>s+itemMax(i),0);
 
-function getMaxScore(){ return ADL_ITEMS.reduce((s,i)=>s+Math.max(...i.options.map(o=>o.v)),0); }
 function getLevel(score){
-  if(score >= 80) return {label:'ติดสังคม/ช่วยเหลือตัวเองได้', cls:'score-good'};
-  if(score >= 60) return {label:'พึ่งพิงเล็กน้อย', cls:'score-mid'};
-  if(score >= 40) return {label:'พึ่งพิงปานกลาง', cls:'score-mid'};
-  if(score >= 20) return {label:'พึ่งพิงมาก', cls:'score-bad'};
-  return {label:'พึ่งพิงทั้งหมด', cls:'score-bad'};
+  if(score >= 80) return {label:'ติดสังคม / ช่วยเหลือตัวเองได้', cls:'score-good', color:'#15803d'};
+  if(score >= 60) return {label:'พึ่งพิงเล็กน้อย', cls:'score-mid', color:'#b45309'};
+  if(score >= 40) return {label:'พึ่งพิงปานกลาง', cls:'score-mid', color:'#b45309'};
+  if(score >= 20) return {label:'พึ่งพิงมาก', cls:'score-bad', color:'#b91c1c'};
+  return {label:'พึ่งพิงทั้งหมด', cls:'score-bad', color:'#b91c1c'};
+}
+function levelBadge(score){
+  if(score===null||score===undefined) return '<span class="badge score-none">ยังไม่ประเมิน</span>';
+  const l = getLevel(score);
+  return `<span class="badge ${l.cls}">${l.label}</span>`;
 }
 
 /* ============================================================
-   PROGRAM 30 DAYS
+   PROGRAM
    ============================================================ */
 const PROGRAM_TASKS = [
-  'ฝึกนั่งทรงตัว 5 นาที',
-  'ฝึกยืนเกาะราว 3 นาที',
-  'ฝึกเดินในบ้าน 10 ก้าว',
-  'ฝึกสวมเสื้อผ้าเอง',
-  'ฝึกแปรงฟัน/ล้างหน้าเอง',
-  'ฝึกใช้ห้องน้ำโดยมีคนช่วย',
-  'ฝึกยกแก้วน้ำดื่มเอง',
-  'ฝึกตักอาหารรับประทานเอง',
-  'ฝึกขึ้นลงบันได 3 ขั้น',
-  'ฝึกบริหารมือ/นิ้ว',
-  'ฝึกยืน-นั่ง 10 ครั้ง',
-  'ฝึกเดินออกกำลังกาย 5 นาที',
-  'ฝึกจัดของใช้ส่วนตัว',
-  'ฝึกพูดคุย/สังคม',
-  'ทบทวนกิจกรรมที่ทำได้ดี'
+  'ฝึกนั่งทรงตัว 5 นาที','ฝึกยืนเกาะราว 3 นาที','ฝึกเดินในบ้าน 10 ก้าว','ฝึกสวมเสื้อผ้าเอง',
+  'ฝึกแปรงฟัน / ล้างหน้าเอง','ฝึกใช้ห้องน้ำโดยมีคนช่วย','ฝึกยกแก้วน้ำดื่มเอง','ฝึกตักอาหารรับประทานเอง',
+  'ฝึกขึ้นลงบันได 3 ขั้น','ฝึกบริหารมือ / นิ้ว','ฝึกยืน-นั่ง 10 ครั้ง','ฝึกเดินออกกำลังกาย 5 นาที',
+  'ฝึกจัดของใช้ส่วนตัว','ฝึกพูดคุย / กิจกรรมสังคม','ทบทวนกิจกรรมที่ทำได้ดี'
 ];
-function getTaskForDay(day){ return PROGRAM_TASKS[(day-1) % PROGRAM_TASKS.length]; }
+const getTaskForDay = d => PROGRAM_TASKS[(d-1) % PROGRAM_TASKS.length];
 
 /* ============================================================
-   TAB NAVIGATION
+   HELPERS
    ============================================================ */
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
-    refreshCurrentTab(tab.dataset.tab);
-  });
-});
-
-function refreshCurrentTab(tab){
-  if(tab==='register') renderPatientList();
-  if(tab==='assess') renderAssessTab();
-  if(tab==='goals') renderGoalsTab();
-  if(tab==='program') renderProgramTab();
-  if(tab==='compare') renderCompareTab();
-  if(tab==='report') renderReportTab();
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-/* ============================================================
-   TOAST
-   ============================================================ */
+function fmtDate(iso){
+  if(!iso) return '-';
+  const d = new Date(String(iso).length===10 ? iso+'T00:00:00' : iso);
+  return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+}
+function phaseLabel(p){ return {baseline:'ก่อนเริ่ม',day15:'วันที่ 15',day30:'วันที่ 30'}[p]||p; }
+function latestAssessment(p){ return effAssess(p).latest; }
+function programDone(p){ return doneDays(p).size; }
+function getCurrentPatient(){ return DB.patients.find(p=>p.id===currentPatientId) || null; }
+function deltaHtml(d){
+  if(d===null||d===undefined) return '<span class="delta-zero">-</span>';
+  if(d>0) return `<span class="delta-up">▲ +${d}</span>`;
+  if(d<0) return `<span class="delta-down">▼ ${d}</span>`;
+  return '<span class="delta-zero">● 0</span>';
+}
+let toastTimer;
 function toast(msg){
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function confirmModal(title,text,onOk){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').textContent = text;
+  document.getElementById('modal-ok').onclick = ()=>{ closeModal(); onOk(); };
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('show'); }
+document.getElementById('modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+function emptyState(el, msg){
+  el.style.display='block';
+  el.innerHTML = `<svg class="i"><use href="#i-users"/></svg><div>${msg}</div>`;
+}
+const NEED_PATIENT = 'กรุณาเลือกผู้สูงอายุจากแท็บ “ทะเบียนผู้สูงอายุ” ก่อน';
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>goTab(tab.dataset.tab));
+});
+function goTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name));
+  refreshCurrentTab(name);
+}
+function refreshCurrentTab(tab){
+  ({register:renderRegisterTab,assess:renderAssessTab,goals:renderGoalsTab,
+    program:renderProgramTab,compare:renderCompareTab,report:renderReportTab})[tab]();
+}
+function renderPatientBar(){
+  const p = getCurrentPatient();
+  const el = document.getElementById('patient-bar');
+  if(!p){
+    el.innerHTML = '<span class="label">ผู้สูงอายุที่เลือก</span><span class="none">ยังไม่ได้เลือก — เลือกจากทะเบียนด้านล่าง</span>';
+    return;
+  }
+  const last = latestAssessment(p);
+  el.innerHTML = `<span class="label">ผู้สูงอายุที่เลือก</span>
+    <span class="pname">${escapeHtml(p.name)}</span>
+    <span class="hint">${p.age?p.age+' ปี':''}${p.hn?' • HN '+escapeHtml(p.hn):''}</span>
+    <span class="pill">${last?('คะแนนล่าสุด '+last.total+'/100'):'ยังไม่มีผลประเมิน'}</span>
+    <span class="pill">โปรแกรม ${programDone(p)}/30 วัน</span>`;
 }
 
 /* ============================================================
-   PATIENT REGISTRATION
+   REGISTER
    ============================================================ */
-function addPatient(){
+function renderRegisterTab(){ renderDashboard(); renderPatientList(); }
+
+function renderDashboard(){
+  const n = DB.patients.length;
+  const assessed = DB.patients.filter(p=>latestAssessment(p)).length;
+  const withBoth = DB.patients.filter(p=>{ const E=effAssess(p); return E.baseline && E.end; });
+  let avg = null;
+  if(withBoth.length){
+    avg = withBoth.reduce((s,p)=>{ const E=effAssess(p); return s + (E.end.total - E.baseline.total); },0)/withBoth.length;
+  }
+  const completed = DB.patients.filter(p=>programDone(p)>=30).length;
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat accent"><div class="label">ผู้สูงอายุทั้งหมด</div><div class="value">${n}</div><div class="sub">ราย</div></div>
+    <div class="stat"><div class="label">ได้รับการประเมินแล้ว</div><div class="value">${assessed}</div><div class="sub">จาก ${n} ราย</div></div>
+    <div class="stat"><div class="label">คะแนนเฉลี่ยที่เปลี่ยนแปลง</div><div class="value">${avg===null?'-':(avg>0?'+':'')+avg.toFixed(1)}</div><div class="sub">เทียบ Baseline</div></div>
+    <div class="stat"><div class="label">ครบโปรแกรม 30 วัน</div><div class="value">${completed}</div><div class="sub">ราย</div></div>`;
+}
+
+function submitPatient(){
   const name = document.getElementById('reg-name').value.trim();
-  if(!name){ toast('⚠️ กรุณากรอกชื่อ-นามสกุล'); return; }
-  const p = {
-    id: uid(),
+  if(!name){ toast('กรุณากรอกชื่อ-นามสกุล'); document.getElementById('reg-name').focus(); return; }
+  const data = {
     name,
     age: document.getElementById('reg-age').value || '',
     gender: document.getElementById('reg-gender').value || '',
-    hn: document.getElementById('reg-hn').value.trim() || '',
-    disease: document.getElementById('reg-disease').value.trim() || '',
-    caregiver: document.getElementById('reg-caregiver').value.trim() || '',
-    assessments: { baseline:null, day15:null, day30:null },
-    goals: {},
-    program: {},
-    createdAt: new Date().toISOString()
+    hn: document.getElementById('reg-hn').value.trim(),
+    disease: document.getElementById('reg-disease').value.trim(),
+    caregiver: document.getElementById('reg-caregiver').value.trim()
   };
-  DB.patients.push(p);
-  saveDB();
-  clearRegisterForm();
-  renderPatientList();
-  toast('✅ เพิ่มผู้สูงอายุเรียบร้อย');
+  if(editingId){
+    const p = DB.patients.find(x=>x.id===editingId);
+    if(p) Object.assign(p,data);
+    toast('แก้ไขข้อมูลเรียบร้อย');
+  } else {
+    DB.patients.push({ id:uid(), ...data,
+      assessments:{baseline:null,day15:null,day30:null}, goals:{}, program:{}, createdAt:new Date().toISOString() });
+    toast('เพิ่มผู้สูงอายุเรียบร้อย');
+  }
+  saveDB(); clearRegisterForm(); renderRegisterTab(); renderPatientBar();
 }
 
 function clearRegisterForm(){
-  ['reg-name','reg-age','reg-gender','reg-hn','reg-disease','reg-caregiver'].forEach(id=>{
-    document.getElementById(id).value = '';
+  ['reg-name','reg-age','reg-gender','reg-hn','reg-disease','reg-caregiver'].forEach(id=>document.getElementById(id).value='');
+  editingId = null;
+  document.getElementById('reg-title').innerHTML = ico('i-plus')+'เพิ่มผู้สูงอายุใหม่';
+  document.querySelector('#reg-submit span').textContent = 'เพิ่มผู้สูงอายุ';
+}
+
+function editPatient(id){
+  const p = DB.patients.find(x=>x.id===id); if(!p) return;
+  editingId = id;
+  document.getElementById('reg-name').value = p.name;
+  document.getElementById('reg-age').value = p.age;
+  document.getElementById('reg-gender').value = p.gender;
+  document.getElementById('reg-hn').value = p.hn;
+  document.getElementById('reg-disease').value = p.disease;
+  document.getElementById('reg-caregiver').value = p.caregiver;
+  document.getElementById('reg-title').innerHTML = ico('i-edit')+'แก้ไขข้อมูล: '+escapeHtml(p.name);
+  document.querySelector('#reg-submit span').textContent = 'บันทึกการแก้ไข';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('reg-name').focus();
+}
+
+function deletePatient(id){
+  const p = DB.patients.find(x=>x.id===id); if(!p) return;
+  confirmModal('ลบข้อมูลผู้สูงอายุ',`ต้องการลบ “${p.name}” และผลประเมินทั้งหมดหรือไม่? การลบไม่สามารถกู้คืนได้`,()=>{
+    DB.patients = DB.patients.filter(x=>x.id!==id);
+    if(currentPatientId===id) currentPatientId=null;
+    if(editingId===id) clearRegisterForm();
+    saveDB(); renderRegisterTab(); renderPatientBar(); toast('ลบข้อมูลแล้ว');
   });
 }
 
 function renderPatientList(){
-  const q = (document.getElementById('search-patient').value || '').toLowerCase().trim();
+  const q = (document.getElementById('search-patient').value||'').toLowerCase().trim();
   const list = document.getElementById('patient-list');
   let patients = DB.patients;
-  if(q){
-    patients = patients.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      (p.hn||'').toLowerCase().includes(q) ||
-      (p.disease||'').toLowerCase().includes(q)
-    );
-  }
+  if(q) patients = patients.filter(p=>p.name.toLowerCase().includes(q)||(p.hn||'').toLowerCase().includes(q)||(p.disease||'').toLowerCase().includes(q));
   if(!patients.length){
-    list.innerHTML = '<div class="empty">ไม่มีข้อมูลผู้สูงอายุ' + (q?'ที่ตรงกับคำค้นหา':'') + '</div>';
+    list.innerHTML = `<div class="empty"><svg class="i"><use href="#i-users"/></svg><div>${q?'ไม่พบข้อมูลที่ตรงกับคำค้นหา':'ยังไม่มีข้อมูลผู้สูงอายุ — เพิ่มรายแรกจากฟอร์มด้านบน'}</div></div>`;
     return;
   }
-  list.innerHTML = patients.map(p=>{
-    const last = p.assessments.day30 || p.assessments.day15 || p.assessments.baseline;
-    const scoreTxt = last ? `คะแนนล่าสุด: ${last.total}/100` : 'ยังไม่มีผลประเมิน';
-    return `<div class="patient-card ${p.id===currentPatientId?'selected':''}" onclick="selectPatient('${p.id}')">
-      <div class="pname">${escapeHtml(p.name)} ${p.age?'('+p.age+' ปี)':''}</div>
-      <div class="pinfo">${p.hn?'HN: '+escapeHtml(p.hn)+' • ':''}${p.gender||''} ${p.disease?'• '+escapeHtml(p.disease):''}</div>
-      <div class="pinfo">${scoreTxt}</div>
-    </div>`;
-  }).join('');
+  list.innerHTML = `<table>
+    <thead><tr><th>ชื่อ-นามสกุล</th><th>HN</th><th>โรคประจำตัว</th><th class="num">คะแนนล่าสุด</th><th>ระดับ</th><th class="num">โปรแกรม</th><th></th></tr></thead>
+    <tbody>${patients.map(p=>{
+      const last = latestAssessment(p);
+      return `<tr class="${p.id===currentPatientId?'selected':''}">
+        <td class="name-cell">${escapeHtml(p.name)}<small>${p.age?p.age+' ปี':''}${p.gender?' • '+p.gender:''}</small></td>
+        <td>${escapeHtml(p.hn)||'-'}</td>
+        <td>${escapeHtml(p.disease)||'-'}</td>
+        <td class="num"><strong>${last?last.total:'-'}</strong></td>
+        <td>${levelBadge(last?last.total:null)}</td>
+        <td class="num">${programDone(p)}/30</td>
+        <td><div class="actions">
+          <button class="btn-primary btn-sm" onclick="selectPatient('${p.id}')">${p.id===currentPatientId?ico('i-check')+'เลือกอยู่':'เลือก'}</button>
+          <button class="btn-outline btn-sm" onclick="editPatient('${p.id}')" aria-label="แก้ไข">${ico('i-edit')}</button>
+          <button class="btn-danger btn-sm" onclick="deletePatient('${p.id}')" aria-label="ลบ">${ico('i-trash')}</button>
+        </div></td></tr>`;
+    }).join('')}</tbody></table>`;
 }
 
 function selectPatient(id){
   currentPatientId = id;
-  renderPatientList();
-  toast('เลือก: ' + DB.patients.find(p=>p.id===id).name);
-  const activeTab = document.querySelector('.tab.active').dataset.tab;
-  if(activeTab!=='register') refreshCurrentTab(activeTab);
-}
-
-function getCurrentPatient(){
-  return DB.patients.find(p=>p.id===currentPatientId) || null;
-}
-
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  renderPatientList(); renderPatientBar();
+  toast('เลือก: '+DB.patients.find(p=>p.id===id).name+' — ไปที่แท็บ “ตรวจรายวัน” เพื่อบันทึก');
 }
 
 /* ============================================================
-   ASSESSMENT TAB
+   ASSESS
    ============================================================ */
 function renderAssessTab(){
   const p = getCurrentPatient();
   const info = document.getElementById('assess-patient-info');
   const form = document.getElementById('adl-form');
-  if(!p){
-    info.style.display='block';
-    info.innerHTML = 'กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน';
-    form.style.display='none';
-    return;
-  }
-  info.style.display='block';
-  info.innerHTML = `<strong>${escapeHtml(p.name)}</strong> ${p.age?'('+p.age+' ปี)':''} ${p.hn?'• HN: '+escapeHtml(p.hn):''}`;
-  form.style.display='block';
-  buildADLForm();
-  loadAssessment();
+  const wrap = document.getElementById('phase-wrap');
+  if(!p){ emptyState(info,NEED_PATIENT); form.style.display='none'; wrap.style.display='none'; return; }
+  info.style.display='none'; form.style.display='block'; wrap.style.display='flex';
+  buildADLForm(); loadAssessment();
 }
-
 function buildADLForm(){
-  const container = document.getElementById('adl-items');
-  container.innerHTML = ADL_ITEMS.map(item=>`
+  document.getElementById('adl-items').innerHTML = ADL_ITEMS.map((item,i)=>`
     <div class="adl-item">
+      <div class="adl-no">${i+1}</div>
       <div class="name">${item.name}<small>${item.desc||''}</small></div>
-      <select data-item="${item.id}" onchange="updateTotalScore()">
-        ${item.options.map(o=>`<option value="${o.v}">${o.v} - ${o.t}</option>`).join('')}
+      <select data-item="${item.id}" onchange="updateTotalScore()" aria-label="${item.name}">
+        ${item.options.map(o=>`<option value="${o.v}">${o.v} — ${o.t}</option>`).join('')}
       </select>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
-
 function loadAssessment(){
-  const p = getCurrentPatient();
-  if(!p) return;
+  const p = getCurrentPatient(); if(!p) return;
   const phase = document.getElementById('assess-phase').value;
   const data = p.assessments[phase];
   ADL_ITEMS.forEach(item=>{
     const sel = document.querySelector(`#adl-items select[data-item="${item.id}"]`);
     if(!sel) return;
-    if(data && data.scores && data.scores[item.id] !== undefined){
-      sel.value = data.scores[item.id];
-    } else {
-      sel.value = item.options[0].v;
-    }
+    sel.value = (data && data.scores && data.scores[item.id]!==undefined) ? data.scores[item.id] : item.options[0].v;
   });
+  document.getElementById('assessed-note').textContent = data ? ('บันทึกล่าสุดเมื่อ '+fmtDate(data.date)) : 'ยังไม่เคยบันทึกในช่วงนี้';
   updateTotalScore();
 }
-
 function updateTotalScore(){
   let total = 0;
   ADL_ITEMS.forEach(item=>{
     const sel = document.querySelector(`#adl-items select[data-item="${item.id}"]`);
     if(sel) total += parseInt(sel.value,10);
   });
-  const el = document.getElementById('total-score');
-  el.textContent = total + ' / ' + getMaxScore();
   const lvl = getLevel(total);
-  el.className = 'score-badge ' + lvl.cls;
-  document.getElementById('dep-level').textContent = lvl.label;
+  document.getElementById('total-num').textContent = total;
+  const m = document.getElementById('total-meter');
+  m.style.width = (total/MAX_SCORE*100)+'%'; m.style.background = lvl.color;
+  const d = document.getElementById('dep-level');
+  d.textContent = lvl.label; d.className = 'badge '+lvl.cls;
   return total;
 }
-
 function saveAssessment(){
-  const p = getCurrentPatient();
-  if(!p){ toast('⚠️ กรุณาเลือกผู้สูงอายุก่อน'); return; }
+  const p = getCurrentPatient(); if(!p){ toast('กรุณาเลือกผู้สูงอายุก่อน'); return; }
   const phase = document.getElementById('assess-phase').value;
   const scores = {};
   ADL_ITEMS.forEach(item=>{
-    const sel = document.querySelector(`#adl-items select[data-item="${item.id}"]`);
-    scores[item.id] = parseInt(sel.value,10);
+    scores[item.id] = parseInt(document.querySelector(`#adl-items select[data-item="${item.id}"]`).value,10);
   });
-  const total = Object.values(scores).reduce((a,b)=>a+b,0);
-  p.assessments[phase] = {
-    scores, total,
-    date: new Date().toISOString()
-  };
-  saveDB();
-  toast('💾 บันทึกผลประเมิน ' + phaseLabel(phase) + ' แล้ว');
-  renderPatientList();
-}
-
-function phaseLabel(phase){
-  return {baseline:'ก่อนเริ่ม', day15:'วันที่ 15', day30:'วันที่ 30'}[phase] || phase;
+  p.assessments[phase] = { scores, total:Object.values(scores).reduce((a,b)=>a+b,0), date:new Date().toISOString() };
+  saveDB(); renderPatientBar();
+  document.getElementById('assessed-note').textContent = 'บันทึกล่าสุดเมื่อ '+fmtDate(p.assessments[phase].date);
+  toast('บันทึกผลประเมิน '+phaseLabel(phase)+' แล้ว');
 }
 
 /* ============================================================
-   GOALS TAB
+   GOALS
    ============================================================ */
 function renderGoalsTab(){
   const p = getCurrentPatient();
   const info = document.getElementById('goals-patient-info');
   const form = document.getElementById('goals-form');
-  if(!p){
-    info.style.display='block';
-    info.innerHTML = 'กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน';
-    form.style.display='none';
-    return;
-  }
-  info.style.display='block';
-  info.innerHTML = `<strong>${escapeHtml(p.name)}</strong>`;
-  form.style.display='block';
-
-  const container = document.getElementById('goals-list');
-  container.innerHTML = ADL_ITEMS.map(item=>{
-    const currentMax = Math.max(...item.options.map(o=>o.v));
-    const goal = (p.goals && p.goals[item.id] !== undefined) ? p.goals[item.id] : currentMax;
+  if(!p){ emptyState(info,NEED_PATIENT); form.style.display='none'; return; }
+  info.style.display='none'; form.style.display='block';
+  const base = effAssess(p).baseline;
+  document.getElementById('goals-list').innerHTML = ADL_ITEMS.map((item,i)=>{
+    const mx = itemMax(item);
+    const goal = (p.goals && p.goals[item.id]!==undefined) ? p.goals[item.id] : mx;
+    const b = base && base.scores ? base.scores[item.id] : null;
     return `<div class="adl-item">
-      <div class="name">${item.name}<small>เป้าหมายคะแนนเต็ม ${currentMax}</small></div>
-      <select data-goal="${item.id}">
-        ${item.options.map(o=>`<option value="${o.v}" ${o.v===goal?'selected':''}>${o.v} - ${o.t}</option>`).join('')}
-      </select>
-    </div>`;
+      <div class="adl-no">${i+1}</div>
+      <div class="name">${item.name}<small>${b!==null?'ปัจจุบัน (Baseline): '+b+' • ':''}คะแนนเต็ม ${mx}</small></div>
+      <select data-goal="${item.id}" aria-label="เป้าหมาย ${item.name}">
+        ${item.options.map(o=>`<option value="${o.v}" ${o.v===goal?'selected':''}>${o.v} — ${o.t}</option>`).join('')}
+      </select></div>`;
   }).join('');
 }
-
-function saveGoals(){
-  const p = getCurrentPatient();
-  if(!p) return;
-  const goals = {};
-  document.querySelectorAll('#goals-list select[data-goal]').forEach(sel=>{
-    goals[sel.dataset.goal] = parseInt(sel.value,10);
+function setGoalsToMax(){
+  ADL_ITEMS.forEach(item=>{
+    const sel = document.querySelector(`#goals-list select[data-goal="${item.id}"]`);
+    if(sel) sel.value = itemMax(item);
   });
-  p.goals = goals;
-  saveDB();
-  toast('🎯 บันทึกเป้าหมายแล้ว');
+}
+function saveGoals(){
+  const p = getCurrentPatient(); if(!p) return;
+  const goals = {};
+  document.querySelectorAll('#goals-list select[data-goal]').forEach(s=>goals[s.dataset.goal]=parseInt(s.value,10));
+  p.goals = goals; saveDB(); toast('บันทึกเป้าหมายแล้ว');
 }
 
 /* ============================================================
-   PROGRAM TAB
+   PROGRAM
    ============================================================ */
+/* ---- daily helpers ---- */
+const DAY_MS = 86400000;
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayStr(){ return ymd(new Date()); }
+function dayNumber(start,date){ return Math.round((new Date(date+'T00:00:00')-new Date(start+'T00:00:00'))/DAY_MS)+1; }
+function dateOfDay(start,n){ const d=new Date(start+'T00:00:00'); d.setDate(d.getDate()+n-1); return ymd(d); }
+function dailyKeys(p){ return Object.keys(p.daily||{}).sort(); }
+function firstDaily(p){ const k=dailyKeys(p); return k.length?p.daily[k[0]]:null; }
+function lastDaily(p){ const k=dailyKeys(p); return k.length?p.daily[k[k.length-1]]:null; }
+function dailyAtDay(p,n){ return p.startDate ? (p.daily&&p.daily[dateOfDay(p.startDate,n)])||null : null; }
+function effAssess(p){
+  const a=p.assessments, f=firstDaily(p), l=lastDaily(p);
+  const baseline = a.baseline || f || null;
+  const day15 = a.day15 || dailyAtDay(p,15);
+  const day30 = a.day30 || dailyAtDay(p,30);
+  const latest = l || a.day30 || a.day15 || a.baseline || null;
+  const end = (latest && latest!==baseline) ? latest : null;
+  return {baseline,day15,day30,latest,end};
+}
+function doneDays(p){
+  const s=new Set();
+  Object.keys(p.program||{}).forEach(d=>{ if(p.program[d]) s.add(+d); });
+  if(p.startDate) dailyKeys(p).forEach(k=>{ const n=dayNumber(p.startDate,k); if(n>=1&&n<=30) s.add(n); });
+  return s;
+}
+
+/* ---- daily tab ---- */
 function renderProgramTab(){
   const p = getCurrentPatient();
   const info = document.getElementById('program-patient-info');
   const content = document.getElementById('program-content');
-  if(!p){
-    info.style.display='block';
-    info.innerHTML = 'กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน';
-    content.style.display='none';
-    return;
+  if(!p){ emptyState(info,NEED_PATIENT); content.style.display='none'; return; }
+  info.style.display='none'; content.style.display='block';
+  if(!p.daily) p.daily = {};
+  const dateEl = document.getElementById('daily-date');
+  if(!dateEl.value) dateEl.value = todayStr();
+  buildDailyForm();
+  loadDaily();
+}
+function buildDailyForm(){
+  document.getElementById('daily-items').innerHTML = ADL_ITEMS.map((item,i)=>`
+    <div class="adl-item">
+      <div class="adl-no">${i+1}</div>
+      <div class="name">${item.name}<small>${item.desc||''}</small></div>
+      <select data-daily="${item.id}" onchange="updateDailyTotal()" aria-label="${item.name}">
+        ${item.options.map(o=>`<option value="${o.v}">${o.v} — ${o.t}</option>`).join('')}
+      </select>
+    </div>`).join('');
+}
+function shiftDay(delta){
+  const el = document.getElementById('daily-date');
+  const d = new Date((el.value||todayStr())+'T00:00:00');
+  d.setDate(d.getDate()+delta);
+  el.value = ymd(d);
+  loadDaily();
+}
+function changeStart(){
+  const p = getCurrentPatient(); if(!p) return;
+  const v = document.getElementById('daily-start').value;
+  if(!v) return;
+  p.startDate = v; saveDB(); loadDaily(); renderPatientBar();
+  toast('ตั้งวันเริ่มโปรแกรมเป็น '+fmtDate(v));
+}
+function loadDaily(){
+  const p = getCurrentPatient(); if(!p) return;
+  const dateEl = document.getElementById('daily-date');
+  const startEl = document.getElementById('daily-start');
+  if(!dateEl.value) dateEl.value = todayStr();
+  const date = dateEl.value;
+  startEl.value = p.startDate || date;
+  const start = startEl.value;
+  const n = dayNumber(start,date);
+  const inRange = n>=1 && n<=30;
+
+  const badge = document.getElementById('daily-daynum');
+  badge.textContent = inRange ? 'วันที่ '+n+' จาก 30' : 'นอกช่วงโปรแกรม';
+  badge.className = 'daynum-badge'+(inRange?'':' out');
+  document.getElementById('daily-warning').innerHTML = inRange ? '' :
+    '<div class="warn-box">วันที่เลือกอยู่นอกช่วง 30 วันของโปรแกรม กรุณาเลือกวันที่ใหม่ หรือปรับ “วันเริ่มโปรแกรม”</div>';
+  document.getElementById('daily-save').disabled = !inRange;
+  document.getElementById('daily-save').style.opacity = inRange?1:.5;
+
+  const rec = p.daily[date];
+  let src = rec, status;
+  if(rec){
+    status = 'บันทึกแล้วเมื่อวันที่ '+fmtDate(date);
+  } else {
+    const prev = dailyKeys(p).filter(k=>k<date).pop();
+    src = prev ? p.daily[prev] : p.assessments.baseline;
+    status = prev ? 'ยังไม่ได้บันทึก — ดึงค่าเริ่มต้นจากการตรวจเมื่อ '+fmtDate(prev) : 'ยังไม่ได้บันทึกของวันนี้';
   }
-  info.style.display='block';
-  info.innerHTML = `<strong>${escapeHtml(p.name)}</strong> — โปรแกรมฝึก 30 วัน`;
-  content.style.display='block';
-
-  const done = p.program ? Object.values(p.program).filter(Boolean).length : 0;
-  const percent = Math.round(done/30*100);
-  document.getElementById('prog-done').textContent = done;
-  document.getElementById('prog-percent').textContent = percent + '%';
-  document.getElementById('prog-bar').style.width = percent + '%';
-
-  const grid = document.getElementById('program-grid');
-  grid.innerHTML = Array.from({length:30},(_,i)=>{
-    const day = i+1;
-    const isDone = p.program && p.program[day];
-    return `<div class="day-card ${isDone?'done':''}">
-      <div class="day-num">วันที่ ${day}</div>
-      <div style="font-size:.72rem;color:#475569;margin:4px 0;">${getTaskForDay(day)}</div>
-      <label><input type="checkbox" ${isDone?'checked':''} onchange="toggleProgramDay(${day}, this.checked)"> ทำแล้ว</label>
-    </div>`;
-  }).join('');
+  document.getElementById('daily-status').textContent = status;
+  document.getElementById('daily-del').style.display = rec ? 'inline-flex' : 'none';
+  ADL_ITEMS.forEach(item=>{
+    const sel = document.querySelector(`#daily-items select[data-daily="${item.id}"]`);
+    if(!sel) return;
+    sel.value = (src && src.scores && src.scores[item.id]!==undefined) ? src.scores[item.id] : item.options[0].v;
+  });
+  document.getElementById('daily-trained').checked = !!(rec && rec.trained);
+  document.getElementById('daily-note').value = rec ? (rec.note||'') : '';
+  document.getElementById('daily-task').textContent = inRange ? getTaskForDay(n) : '-';
+  updateDailyTotal();
+  renderDailyStats(p);
+  renderDailyGrid(p);
+}
+function updateDailyTotal(){
+  let total = 0;
+  ADL_ITEMS.forEach(item=>{
+    const sel = document.querySelector(`#daily-items select[data-daily="${item.id}"]`);
+    if(sel) total += parseInt(sel.value,10);
+  });
+  const lvl = getLevel(total);
+  document.getElementById('d-total-num').textContent = total;
+  const m = document.getElementById('d-total-meter');
+  m.style.width = (total/MAX_SCORE*100)+'%'; m.style.background = lvl.color;
+  const d = document.getElementById('d-dep-level');
+  d.textContent = lvl.label; d.className = 'badge '+lvl.cls;
+  return total;
+}
+function saveDaily(){
+  const p = getCurrentPatient(); if(!p){ toast('กรุณาเลือกผู้สูงอายุก่อน'); return; }
+  const date = document.getElementById('daily-date').value;
+  if(!date){ toast('กรุณาเลือกวันที่ตรวจ'); return; }
+  if(!p.startDate) p.startDate = document.getElementById('daily-start').value || date;
+  const n = dayNumber(p.startDate,date);
+  if(n<1||n>30){ toast('วันที่นี้อยู่นอกช่วง 30 วัน'); return; }
+  const scores = {};
+  ADL_ITEMS.forEach(item=>{
+    scores[item.id] = parseInt(document.querySelector(`#daily-items select[data-daily="${item.id}"]`).value,10);
+  });
+  if(!p.daily) p.daily = {};
+  p.daily[date] = {
+    scores, total:Object.values(scores).reduce((a,b)=>a+b,0), date,
+    trained: document.getElementById('daily-trained').checked,
+    note: document.getElementById('daily-note').value.trim()
+  };
+  saveDB(); renderPatientBar(); loadDaily();
+  toast('บันทึกผลวันที่ '+n+' แล้ว (คะแนน '+p.daily[date].total+')');
+}
+function deleteDaily(){
+  const p = getCurrentPatient(); if(!p) return;
+  const date = document.getElementById('daily-date').value;
+  if(!p.daily || !p.daily[date]) return;
+  confirmModal('ลบบันทึกรายวัน','ต้องการลบบันทึกการตรวจของวันที่ '+fmtDate(date)+' หรือไม่?',()=>{
+    delete p.daily[date]; saveDB(); renderPatientBar(); loadDaily(); toast('ลบบันทึกแล้ว');
+  });
+}
+function renderDailyStats(p){
+  const E = effAssess(p);
+  const days = programDone(p);
+  const diff = (E.baseline && E.end) ? E.end.total - E.baseline.total : null;
+  let streak = 0;
+  if(p.startDate){
+    const set = new Set(dailyKeys(p).map(k=>dayNumber(p.startDate,k)).filter(n=>n>=1&&n<=30));
+    let mx = 0; set.forEach(n=>{ if(n>mx) mx=n; });
+    for(let d=mx; set.has(d); d--) streak++;
+  }
+  const trainedDays = dailyKeys(p).filter(k=>p.daily[k].trained).length;
+  document.getElementById('daily-stats').innerHTML = `
+    <div class="stat accent"><div class="label">ตรวจแล้ว</div><div class="value">${days}</div><div class="sub">จาก 30 วัน (${Math.round(days/30*100)}%)</div></div>
+    <div class="stat"><div class="label">คะแนนล่าสุด</div><div class="value">${E.latest?E.latest.total:'-'}</div><div class="sub">${E.latest?getLevel(E.latest.total).label:'ยังไม่มีผลประเมิน'}</div></div>
+    <div class="stat"><div class="label">เปลี่ยนแปลงจากวันแรก</div><div class="value">${diff===null?'-':(diff>0?'+':'')+diff}</div><div class="sub">คะแนน ADL</div></div>
+    <div class="stat"><div class="label">ตรวจต่อเนื่อง</div><div class="value">${streak}</div><div class="sub">วัน • ฝึกกิจกรรม ${trainedDays} วัน</div></div>`;
+}
+function renderDailyGrid(p){
+  const start = p.startDate || document.getElementById('daily-start').value || todayStr();
+  const sel = document.getElementById('daily-date').value;
+  const today = todayStr();
+  let html = '';
+  for(let n=1; n<=30; n++){
+    const date = dateOfDay(start,n);
+    const rec = p.daily[date];
+    const legacy = !rec && p.program && p.program[n];
+    const cls = rec ? getLevel(rec.total).cls.replace('score-','') : '';
+    const dd = new Date(date+'T00:00:00');
+    const short = dd.getDate()+'/'+(dd.getMonth()+1);
+    html += `<div class="tile ${cls} ${date===sel?'sel':''} ${date===today?'today':''}" role="button" tabindex="0"
+      onclick="pickDay('${date}')" onkeydown="if(event.key==='Enter')pickDay('${date}')">
+      <div class="tn">วันที่ ${n} • ${short}</div>
+      <div class="ts">${rec?rec.total:(legacy?'✓':'–')}</div></div>`;
+  }
+  document.getElementById('program-grid').innerHTML = html;
+}
+function pickDay(date){
+  document.getElementById('daily-date').value = date;
+  loadDaily();
+  window.scrollTo({top:document.getElementById('daily-date').getBoundingClientRect().top+window.scrollY-120,behavior:'smooth'});
 }
 
-function toggleProgramDay(day, checked){
-  const p = getCurrentPatient();
-  if(!p) return;
-  if(!p.program) p.program = {};
-  p.program[day] = checked;
-  saveDB();
-  renderProgramTab();
+function dailyTrendChart(p){
+  const W=420,H=210,L=40,R=20,T=18,B=34, iw=W-L-R, ih=H-T-B;
+  const pts = dailyKeys(p).map(k=>({n:p.startDate?dayNumber(p.startDate,k):1,v:p.daily[k].total}))
+    .filter(q=>q.n>=1&&q.n<=30).sort((a,b)=>a.n-b.n);
+  if(!pts.length) return '<div class="empty">ยังไม่มีผลประเมิน</div>';
+  const x = n => L + iw*((n-1)/29);
+  const y = v => T + ih*(1-v/MAX_SCORE);
+  let g='';
+  [0,25,50,75,100].forEach(v=>{
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#e3e8ee"/>
+        <text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#5f6f80">${v}</text>`;
+  });
+  const xl = [1,5,10,15,20,25,30].map(n=>`<text x="${x(n)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#5f6f80">${n}</text>`).join('');
+  const line = pts.length>1 ? `<polyline fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linejoin="round" points="${pts.map(q=>x(q.n)+','+y(q.v)).join(' ')}"/>` : '';
+  const dots = pts.map(q=>`<circle cx="${x(q.n)}" cy="${y(q.v)}" r="${pts.length>12?3.5:5}" fill="#fff" stroke="#0f766e" stroke-width="2.2"/>`
+    + (pts.length<=8?`<text x="${x(q.n)}" y="${y(q.v)-11}" text-anchor="middle" font-size="11" font-weight="700" fill="#0f2a43">${q.v}</text>`:'')).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="กราฟคะแนน ADL รายวัน">${g}${line}${dots}${xl}
+    <text x="${W/2}" y="${H-0}" text-anchor="middle" font-size="9" fill="#5f6f80">วันที่ของโปรแกรม</text></svg>`;
+}
+function dailyReportTable(p){
+  const keys = dailyKeys(p);
+  if(!keys.length) return '';
+  const rows = keys.map(k=>{
+    const r = p.daily[k];
+    const n = p.startDate ? dayNumber(p.startDate,k) : '-';
+    return `<tr><td class="num">${n}</td><td>${fmtDate(k)}</td><td class="num"><strong>${r.total}</strong></td><td>${levelBadge(r.total)}</td><td class="num">${r.trained?'✓':'-'}</td><td>${escapeHtml(r.note)}</td></tr>`;
+  }).join('');
+  return `<h3>บันทึกการตรวจรายวัน</h3>
+    <table><thead><tr><th class="num">วันที่</th><th>วัน/เดือน/ปี</th><th class="num">คะแนน ADL</th><th>ระดับ</th><th class="num">ฝึก</th><th>บันทึกเพิ่มเติม</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 /* ============================================================
-   COMPARE TAB
+   COMPARE
    ============================================================ */
 function renderCompareTab(){
   const p = getCurrentPatient();
   const info = document.getElementById('compare-patient-info');
   const content = document.getElementById('compare-content');
-  if(!p){
-    info.style.display='block';
-    info.innerHTML = 'กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน';
-    content.style.display='none';
-    return;
-  }
-  info.style.display='block';
-  info.innerHTML = `<strong>${escapeHtml(p.name)}</strong>`;
-  content.style.display='block';
-
-  const base = p.assessments.baseline;
-  const d15 = p.assessments.day15;
-  const d30 = p.assessments.day30;
-
-  document.getElementById('cmp-base').textContent = base ? base.total : '-';
-  document.getElementById('cmp-d15').textContent = d15 ? d15.total : '-';
-  document.getElementById('cmp-d30').textContent = d30 ? d30.total : '-';
-
-  let change = '-';
-  if(base && d30){
-    const diff = d30.total - base.total;
-    change = (diff>0?'+':'') + diff;
-  } else if(base && d15){
-    const diff = d15.total - base.total;
-    change = (diff>0?'+':'') + diff + ' (15 วัน)';
-  }
+  if(!p){ emptyState(info,NEED_PATIENT); content.style.display='none'; return; }
+  info.style.display='none'; content.style.display='block';
+  const E = effAssess(p); const base=E.baseline, d15=E.day15, d30=E.day30;
+  document.getElementById('cmp-base').textContent = base?base.total:'-';
+  document.getElementById('cmp-d15').textContent = d15?d15.total:'-';
+  document.getElementById('cmp-d30').textContent = d30?d30.total:'-';
+  let change='-', sub='';
+  const end = E.end;
+  if(base && end){
+    const diff = end.total-base.total;
+    change = (diff>0?'+':'')+diff;
+    sub = 'Baseline → ล่าสุด ('+fmtDate(end.date)+')';
+  } else sub = 'ต้องมีผลประเมินอย่างน้อย 2 ช่วง';
   document.getElementById('cmp-change').textContent = change;
+  document.getElementById('cmp-change-sub').textContent = sub;
 
-  // per-item table
-  const rows = ADL_ITEMS.map(item=>{
-    const b = base && base.scores ? base.scores[item.id] : null;
-    const m = d15 && d15.scores ? d15.scores[item.id] : null;
-    const e = d30 && d30.scores ? d30.scores[item.id] : null;
-    const diff = (b!==null && e!==null) ? (e-b) : null;
-    const diffTxt = diff===null ? '-' : (diff>0?'+'+diff:diff);
-    return `<tr>
-      <td>${item.name}</td>
-      <td>${b!==null?b:'-'}</td>
-      <td>${m!==null?m:'-'}</td>
-      <td>${e!==null?e:'-'}</td>
-      <td style="font-weight:700;color:${diff>0?'#16a34a':diff<0?'#dc2626':'#64748b'}">${diffTxt}</td>
-    </tr>`;
+  document.getElementById('trend-chart').innerHTML = dailyKeys(p).length>=2 ? dailyTrendChart(p) : trendChart([
+    {l:'Baseline',v:base?base.total:null},{l:'วันที่ 15',v:d15?d15.total:null},{l:'วันที่ 30',v:d30?d30.total:null}]);
+
+  const latest = E.latest;
+  document.getElementById('item-bars').innerHTML = ADL_ITEMS.map(item=>{
+    const mx = itemMax(item);
+    const b = base&&base.scores?base.scores[item.id]:null;
+    const e = latest&&latest.scores?latest.scores[item.id]:null;
+    const g = p.goals&&p.goals[item.id]!==undefined?p.goals[item.id]:null;
+    return `<div class="hbar"><span>${item.name}</span>
+      <div class="track">
+        ${b!==null?`<div class="base" style="width:${b/mx*100}%"></div>`:''}
+        ${e!==null?`<div class="fill" style="width:${e/mx*100}%;${b!==null&&latest===base?'background:#9fb3c8':''}"></div>`:''}
+        ${g!==null?`<div class="goal" style="left:calc(${g/mx*100}% - 1px)"></div>`:''}
+      </div><strong>${e!==null?e:'-'}</strong></div>`;
   }).join('');
 
-  document.getElementById('compare-table').innerHTML = `
-    <table>
-      <thead><tr><th>กิจกรรม</th><th>Baseline</th><th>วันที่ 15</th><th>วันที่ 30</th><th>เปลี่ยนแปลง</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  const rows = ADL_ITEMS.map(item=>{
+    const b = base&&base.scores?base.scores[item.id]:null;
+    const m = d15&&d15.scores?d15.scores[item.id]:null;
+    const e = d30&&d30.scores?d30.scores[item.id]:null;
+    const diff = (b!==null&&(e!==null||m!==null)) ? ((e!==null?e:m)-b) : null;
+    const g = p.goals&&p.goals[item.id]!==undefined?p.goals[item.id]:'-';
+    return `<tr><td>${item.name}</td><td class="num">${b!==null?b:'-'}</td><td class="num">${m!==null?m:'-'}</td><td class="num">${e!==null?e:'-'}</td><td class="num">${g}</td><td class="num">${deltaHtml(diff)}</td></tr>`;
+  }).join('');
+  document.getElementById('compare-table').innerHTML = `<table>
+    <thead><tr><th>กิจกรรม</th><th class="num">Baseline</th><th class="num">วันที่ 15</th><th class="num">วันที่ 30</th><th class="num">เป้าหมาย</th><th class="num">เปลี่ยนแปลง</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function trendChart(points){
+  const W=420,H=210,L=40,R=20,T=18,B=34;
+  const iw=W-L-R, ih=H-T-B;
+  const x = i => L + iw*(i/(points.length-1));
+  const y = v => T + ih*(1-v/MAX_SCORE);
+  let g='';
+  [0,25,50,75,100].forEach(v=>{
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#e3e8ee"/>
+        <text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#5f6f80">${v}</text>`;
+  });
+  const valid = points.map((p,i)=>({...p,i})).filter(p=>p.v!==null);
+  let line='';
+  if(valid.length>1) line=`<polyline fill="none" stroke="#0f766e" stroke-width="2.5" points="${valid.map(p=>x(p.i)+','+y(p.v)).join(' ')}"/>`;
+  const dots = valid.map(p=>`<circle cx="${x(p.i)}" cy="${y(p.v)}" r="5" fill="#fff" stroke="#0f766e" stroke-width="2.5"/>
+    <text x="${x(p.i)}" y="${y(p.v)-11}" text-anchor="middle" font-size="12" font-weight="700" fill="#0f2a43">${p.v}</text>`).join('');
+  const labels = points.map((p,i)=>`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5f6f80">${p.l}</text>`).join('');
+  if(!valid.length) return '<div class="empty">ยังไม่มีผลประเมิน</div>';
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="กราฟแนวโน้มคะแนน ADL">${g}${line}${dots}${labels}</svg>`;
 }
 
 /* ============================================================
-   REPORT TAB
+   REPORT
    ============================================================ */
+function saveOrg(){ DB.org = document.getElementById('org-name').value; saveDB(); }
+
 function renderReportTab(){
   const p = getCurrentPatient();
   const info = document.getElementById('report-patient-info');
   const content = document.getElementById('report-content');
-  if(!p){
-    info.style.display='block';
-    info.innerHTML = 'กรุณาเลือกผู้สูงอายุจากแท็บ "ทะเบียนผู้สูงอายุ" ก่อน';
-    content.style.display='none';
-    return;
-  }
-  info.style.display='block';
-  info.innerHTML = `<strong>${escapeHtml(p.name)}</strong>`;
-  content.style.display='block';
+  const pb = document.getElementById('print-btn');
+  if(!p){ emptyState(info,NEED_PATIENT); content.style.display='none'; pb.style.display='none'; return; }
+  info.style.display='none'; content.style.display='block'; pb.style.display='inline-flex';
+  document.getElementById('org-name').value = DB.org||'';
+  renderReportBody();
+}
 
-  const base = p.assessments.baseline;
-  const d15 = p.assessments.day15;
-  const d30 = p.assessments.day30;
-  const done = p.program ? Object.values(p.program).filter(Boolean).length : 0;
-
+function renderReportBody(){
+  const p = getCurrentPatient(); if(!p) return;
+  const E = effAssess(p); const base=E.baseline, d15=E.day15, d30=E.day30;
+  const done = programDone(p);
+  const end = E.end;
   const itemRows = ADL_ITEMS.map(item=>{
-    const goal = p.goals && p.goals[item.id] !== undefined ? p.goals[item.id] : '-';
-    const b = base && base.scores ? base.scores[item.id] : '-';
-    const e = d30 && d30.scores ? d30.scores[item.id] : (d15 && d15.scores ? d15.scores[item.id] : '-');
-    return `<tr><td>${item.name}</td><td>${b}</td><td>${e}</td><td>${goal}</td></tr>`;
+    const g = p.goals&&p.goals[item.id]!==undefined?p.goals[item.id]:'-';
+    const b = base&&base.scores?base.scores[item.id]:'-';
+    const e = end&&end.scores?end.scores[item.id]:'-';
+    const diff = (typeof b==='number'&&typeof e==='number')?e-b:null;
+    return `<tr><td>${item.name}</td><td class="num">${b}</td><td class="num">${e}</td><td class="num">${g}</td><td class="num">${deltaHtml(diff)}</td></tr>`;
   }).join('');
 
-  const baseLvl = base ? getLevel(base.total) : null;
-  const d30Lvl = d30 ? getLevel(d30.total) : (d15 ? getLevel(d15.total) : null);
+  let summary = 'ยังไม่มีข้อมูลเพียงพอสำหรับสรุปผล';
+  if(base && end){
+    const diff = end.total-base.total;
+    const l = getLevel(end.total).label;
+    summary = diff>0
+      ? `คะแนน ADL เพิ่มขึ้น <strong>${diff} คะแนน</strong> (จาก ${base.total} เป็น ${end.total}) ปัจจุบันอยู่ในระดับ “${l}”`
+      : diff<0
+      ? `คะแนน ADL ลดลง <strong>${Math.abs(diff)} คะแนน</strong> (จาก ${base.total} เป็น ${end.total}) ควรปรึกษาทีมสุขภาพเพื่อทบทวนแผนการดูแล`
+      : `คะแนน ADL คงที่ที่ ${end.total} คะแนน ปัจจุบันอยู่ในระดับ “${l}”`;
+  } else if(base){
+    summary = `ประเมินครั้งแรกได้ ${base.total} คะแนน อยู่ในระดับ “${getLevel(base.total).label}”`;
+  }
 
-  document.getElementById('report-body').innerHTML = `
-    <div style="text-align:center;margin-bottom:16px;">
-      <h2 style="margin:0;color:#1e40af;">รายงานการประเมิน ADL และติดตามผล 30 วัน</h2>
-      <p style="color:#64748b;font-size:.85rem;">โรงพยาบาล/ศูนย์ดูแลผู้สูงอายุ</p>
+  const row = (lbl,a)=>`<tr><td>${lbl}</td><td class="num">${a?a.total:'-'}</td><td>${a?getLevel(a.total).label:'-'}</td><td>${a?fmtDate(a.date):'-'}</td></tr>`;
+
+  document.getElementById('report-body').innerHTML = `<div class="report">
+    <div class="report-head">
+      <div>
+        <div class="org">${escapeHtml(DB.org)||'ศูนย์ดูแลผู้สูงอายุ'}</div>
+        <h2>รายงานผลการประเมิน ADL<br>และการติดตามผลโปรแกรมฟื้นฟู 30 วัน</h2>
+      </div>
+      <div class="meta">วันที่พิมพ์<br><strong>${fmtDate(new Date().toISOString())}</strong></div>
     </div>
-    <table style="margin-bottom:14px;">
-      <tr><th style="width:150px;">ชื่อ-นามสกุล</th><td>${escapeHtml(p.name)}</td></tr>
-      <tr><th>อายุ</th><td>${p.age||'-'} ปี</td></tr>
-      <tr><th>เพศ</th><td>${p.gender||'-'}</td></tr>
-      <tr><th>HN</th><td>${escapeHtml(p.hn)||'-'}</td></tr>
-      <tr><th>โรคประจำตัว</th><td>${escapeHtml(p.disease)||'-'}</td></tr>
-      <tr><th>ผู้ดูแล</th><td>${escapeHtml(p.caregiver)||'-'}</td></tr>
+
+    <h3>ข้อมูลทั่วไป</h3>
+    <table class="info-table">
+      <tr><th>ชื่อ-นามสกุล</th><td>${escapeHtml(p.name)}</td><th>HN</th><td>${escapeHtml(p.hn)||'-'}</td></tr>
+      <tr><th>อายุ / เพศ</th><td>${p.age?p.age+' ปี':'-'} / ${p.gender||'-'}</td><th>ผู้ดูแล</th><td>${escapeHtml(p.caregiver)||'-'}</td></tr>
+      <tr><th>โรคประจำตัว</th><td colspan="3">${escapeHtml(p.disease)||'-'}</td></tr>
     </table>
 
-    <h3 style="color:#1e40af;font-size:1rem;margin:12px 0 6px;">📊 สรุปคะแนน</h3>
-    <table style="margin-bottom:14px;">
-      <thead><tr><th>ช่วงเวลา</th><th>คะแนน</th><th>ระดับการพึ่งพิง</th></tr></thead>
-      <tbody>
-        <tr><td>ก่อนเริ่ม</td><td>${base?base.total:'-'}</td><td>${baseLvl?baseLvl.label:'-'}</td></tr>
-        <tr><td>วันที่ 15</td><td>${d15?d15.total:'-'}</td><td>${d15?getLevel(d15.total).label:'-'}</td></tr>
-        <tr><td>วันที่ 30</td><td>${d30?d30.total:'-'}</td><td>${d30Lvl?d30Lvl.label:'-'}</td></tr>
-      </tbody>
+    <h3>สรุปผลโดยรวม</h3>
+    <div class="summary-box">${summary}</div>
+
+    <h3>คะแนน Barthel ADL Index</h3>
+    <table>
+      <thead><tr><th>ช่วงเวลา</th><th class="num">คะแนน (เต็ม 100)</th><th>ระดับการพึ่งพิง</th><th>วันที่ประเมิน</th></tr></thead>
+      <tbody>${row('ก่อนเริ่ม (Baseline)',base)}${row('วันที่ 15',d15)}${row('วันที่ 30',d30)}</tbody>
     </table>
 
-    <h3 style="color:#1e40af;font-size:1rem;margin:12px 0 6px;">🎯 รายละเอียดรายกิจกรรม</h3>
-    <table style="margin-bottom:14px;">
-      <thead><tr><th>กิจกรรม</th><th>ก่อนเริ่ม</th><th>หลัง 30 วัน</th><th>เป้าหมาย</th></tr></thead>
+    <h3>รายละเอียดรายกิจกรรม</h3>
+    <table>
+      <thead><tr><th>กิจกรรม</th><th class="num">ก่อนเริ่ม</th><th class="num">ล่าสุด</th><th class="num">เป้าหมาย</th><th class="num">เปลี่ยนแปลง</th></tr></thead>
       <tbody>${itemRows}</tbody>
     </table>
 
-    <h3 style="color:#1e40af;font-size:1rem;margin:12px 0 6px;">📅 ความร่วมมือในโปรแกรม 30 วัน</h3>
-    <p>ทำกิจกรรมสำเร็จ <strong>${done}/30 วัน</strong> (${Math.round(done/30*100)}%)</p>
+    <h3>การตรวจประเมินรายวัน (30 วัน)</h3>
+    <p style="margin-bottom:6px;">บันทึกการตรวจแล้ว <strong>${done} จาก 30 วัน</strong> (${Math.round(done/30*100)}%)</p>
+    <div class="progress"><div style="width:${Math.round(done/30*100)}%"></div></div>
+    ${dailyReportTable(p)}
 
-    <div style="margin-top:24px;display:flex;justify-content:space-between;font-size:.85rem;">
-      <div>ลงชื่อ .................................................<br>ผู้ประเมิน</div>
-      <div>วันที่ ........./........./.........</div>
+    <div class="sign-row">
+      <div><div class="sign-line"></div>ผู้ประเมิน<br><span class="hint">(.....................................................)</span></div>
+      <div><div class="sign-line"></div>ผู้ดูแล / ญาติ รับทราบ<br><span class="hint">(.....................................................)</span></div>
     </div>
-  `;
+  </div>`;
+}
+
+/* ============================================================
+   BACKUP / RESTORE
+   ============================================================ */
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'adl-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+  toast('ดาวน์โหลดไฟล์สำรองข้อมูลแล้ว');
+}
+function importBackup(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.patients)) throw new Error('bad');
+      confirmModal('นำเข้าข้อมูล',`พบข้อมูลผู้สูงอายุ ${d.patients.length} ราย ข้อมูลปัจจุบันในเครื่องจะถูกแทนที่ ต้องการดำเนินการต่อหรือไม่?`,()=>{
+        DB = d; if(!DB.org) DB.org=''; currentPatientId=null; saveDB();
+        goTab('register'); renderPatientBar(); toast('นำเข้าข้อมูลเรียบร้อย');
+      });
+    }catch(e){ toast('ไฟล์ไม่ถูกต้อง'); }
+    ev.target.value='';
+  };
+  r.readAsText(f);
 }
 
 /* ============================================================
    INIT
    ============================================================ */
-renderPatientList();
+renderRegisterTab();
+renderPatientBar();
 </script>
 </body>
 </html>
